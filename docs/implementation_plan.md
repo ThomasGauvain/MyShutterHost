@@ -146,8 +146,11 @@ one database, two front doors, same data.
 | **Rich Text Editing** | **TipTap** (rich text blocks within WYSIWYG) |
 | **Search** | PostgreSQL Full-Text Search → Algolia (at scale) |
 | **Cache** | Redis — self-hosted Docker container on Coolify (same Vultr server) |
+| **Analytics Events DB** | **ClickHouse** — self-hosted Docker on Coolify (billions of view events, sub-second queries) |
+| **Product Analytics** | **PostHog** (self-hosted) — funnels, session analysis, feature flags, GDPR-compliant |
+| **Geolocation** | **MaxMind GeoIP2** — IP → city/region/country, self-hosted database, no API fees |
 | **Plugin SDK** | Custom REST + OAuth2 (for Lightroom/Photoshop plugins) |
-| **Real-time Chat** | **Socket.io** (self-hosted on Vultr via Coolify — WebSocket DMs + group rooms) |
+| **Real-time Chat** | **Socket.io** (self-hosted on Vultr via Coolify — WebSocket DMs + group rooms + live view counters) |
 
 ---
 
@@ -861,14 +864,232 @@ Photographers can optionally add an AI chat widget to their public portfolio web
 
 ---
 
-### 📊 Module 9 — Analytics & Storage
-- [x] Analytics dashboard (page views, gallery views, top photos, visitor locations)
-- [x] External storage connection (link your own S3/Backblaze/Google Drive as overflow storage)
-- [x] Backup & version history (restore deleted photos)
-- [x] Storage usage dashboard (per photographer, per plan tier)
-- [x] Bandwidth and download tracking
+### 📊 Module 9 — Creator Analytics & Audience Intelligence
+
+> **Architecture**: Two-database analytics stack. PostgreSQL handles business data (users, orders, bookings). **ClickHouse** handles the analytics event firehose (billions of view events, sub-second queries). **Redis** powers real-time counters. **PostHog** (self-hosted) handles product funnels and session analysis. **MaxMind GeoIP2** resolves IP → city/region/country with no API fees.
 
 ---
+
+> [!IMPORTANT]
+> **Privacy & Legal Compliance Built In**
+> Age, gender, and behavioral analytics fall under GDPR Article 22 (profiling) and CCPA rules.
+> - Users **consent** to demographic/behavioral analytics at signup (opt-in checkbox, not pre-ticked)
+> - Creators see **aggregated anonymous data only** — never individual user identities
+> - "Names" in stats are replaced with anonymous viewer IDs (hashed fingerprints)
+> - Users can **opt out** in their account settings at any time
+> - Under-13 users (COPPA) are excluded from all demographic tracking
+> - "Personality traits" are implemented as **Audience Interest Segments** (inferred from content engagement, not personal data) — legally cleaner and more useful
+
+---
+
+**⚙️ Analytics Event Pipeline**
+
+```
+User views a photo / page / video / post
+         ↓
+Client fires an event (lightweight, <1KB):
+{
+  event:           "photo_view",
+  contentId:       "photo_abc123",
+  creatorId:       "creator_xyz",
+  viewerToken:     "anon_hash_789a",   ← hashed, NOT real user ID
+  sessionId:       "sess_xyz",
+  duration:        4.2,                ← seconds on this photo
+  scrollDepth:     0.73,               ← 73% of page scrolled
+  referrer:        "instagram",        ← where they came from
+  country:         "US",
+  region:          "Texas",
+  city:            "Austin",
+  device:          "mobile",
+  os:              "iOS",
+  browser:         "Safari",
+  hour:            14,                 ← 2:00 PM local time
+  dayOfWeek:       3,                  ← Wednesday
+  timestamp:       "2026-06-25T19:32Z"
+}
+         ↓
+  ┌──────────────────┐    ┌──────────────────┐
+  │  ClickHouse DB   │    │  Redis Counter   │
+  │  (stored async,  │    │  (real-time      │
+  │   milliseconds)  │    │   view ticker)   │
+  └──────────────────┘    └────────┬─────────┘
+                                   │
+                              Socket.io
+                                   │
+                          Live counter pushed
+                          to all viewers on
+                          that post/gallery
+```
+
+---
+
+**📈 Content Performance Analytics**
+
+*Views & Engagement:*
+- [x] Total views per photo / post / video / gallery / page (all-time, 7d, 30d, 90d, custom range)
+- [x] Unique viewer count (distinct anonymous visitor fingerprints)
+- [x] **View duration** — average time spent on each photo, video (seconds watched), page
+- [x] **Scroll depth** — what % of visitors scrolled past each section of a page
+- [x] **Video completion rate** — what % of viewers watched to 25%, 50%, 75%, 100%
+- [x] **Engagement rate** — (likes + comments + shares + saves) ÷ views × 100
+- [x] Like, comment, share, save counts per post with trend charts
+- [x] Click-through rate — how many viewers clicked "Book Now", "Buy Print", "Follow", etc.
+- [x] **Photo heatmap** — on a gallery page, which individual photos get the most attention (eye-catching vs. skipped)
+- [x] **Gallery exit point** — which photo or page section causes visitors to leave
+
+*Repeat Viewer Intelligence:*
+- [x] **Return visitor rate** — what % of views are from the same anonymous viewer (days/weeks apart)
+- [x] **"Top fans" frequency tracker** — see that anonymous viewer #A7F3 has visited your profile 47 times this month (name always hidden)
+- [x] **Content affinity** — which specific photos/videos does the same anonymous viewer keep returning to
+- [x] **Superfan detection** — flag anonymous viewers who have viewed, liked, and returned more than a configurable threshold
+- [x] View streak detection — content that the same viewer returns to daily
+
+*Real-Time Live Counters:*
+- [x] **Live view ticker on posts** — "🔴 23 people viewing this right now" (updates every second via Socket.io)
+- [x] **Live gallery counter** — real-time count of how many people are in a gallery right now
+- [x] **Trending now indicator** — posts gaining views faster than usual get a "🔥 Trending" badge
+- [x] **Real-time dashboard** — creator dashboard shows live activity as it happens (incoming views, tips, orders)
+- [x] **Spike notifications** — push notification when a post hits unusual traffic (e.g., 10x normal rate in an hour)
+
+---
+
+**👥 Audience Demographics & Segments**
+
+> All demographic data is aggregated (minimum group size of 100 to prevent de-anonymization) and shown as percentages only.
+
+*Age Range Breakdown:*
+- [x] Estimated age range of viewers (based on consented declared age at signup + behavioral signals)
+- [x] Shown as buckets: 13-17 / 18-24 / 25-34 / 35-44 / 45-54 / 55-64 / 65+
+- [x] Which age groups engage most (likes, saves, purchases)
+- [x] Which age groups are most likely to book or buy
+
+*Gender Breakdown:*
+- [x] Self-declared gender distribution of viewers (from consented profile data)
+- [x] Shown as: Woman / Man / Non-binary / Prefer not to say / Unknown
+- [x] Which gender segments engage most with each content type
+
+*Audience Interest Segments (behavioral, not personal data):*
+- [x] Platform infers interest clusters from what content each anonymous viewer engages with:
+  - 🎭 **Cosplay Enthusiast** — engages heavily with cosplay content
+  - 👗 **Fashion Forward** — engages with fashion, styling, editorial
+  - 📸 **Photography Hobbyist** — browses technique posts, gear discussions
+  - 💒 **Wedding Prospect** — views wedding galleries, clicks "Book a Consultation"
+  - 🎨 **Art Collector** — views and saves fine art, landscape, abstract work
+  - 🏋️ **Fitness & Lifestyle** — engages with fitness model, active lifestyle content
+  - 🎬 **Production Professional** — views videography, behind-the-scenes, crew content
+  - 🦸 **Fan / Convention Goer** — follows cosplayers, visits convention event posts
+  - 💼 **Commercial Buyer** — views commercial photography/video, clicks rate cards
+  - 🎓 **Creative Student** — engages with tutorials, educational content
+- [x] Creator sees their top 3 audience segments as a pie chart
+- [x] Segment performance — which segments convert to buyers/bookers best
+
+---
+
+**🌍 Geographic Analytics**
+
+- [x] **World heatmap** — interactive globe/map showing where all views originate, colored by density
+- [x] **Top countries** — ranked list with view counts and % of total
+- [x] **Top regions / states** — drill down from country into states/provinces
+- [x] **Top cities** — most common cities viewers are in
+- [x] **Local vs. out-of-market** — what % of viewers are within 50mi of creator's listed location vs. elsewhere
+- [x] City-level filtering — see stats for "only viewers in Austin"
+- [x] Geographic revenue breakdown — where are your buyers located?
+- [x] International reach score — metric of how globally distributed your audience is
+
+---
+
+**⏰ Time & Pattern Analytics**
+
+- [x] **Hourly heatmap** — 24-hour grid showing views by hour of day (across your audience's local times)
+- [x] **Day of week heatmap** — Monday–Sunday breakdown, which days drive the most views
+- [x] **Best time to post** — AI recommendation based on when your specific audience is most active
+  - *"Your audience is most active Tuesday 7–9pm. Schedule your next post for then."*
+- [x] **Seasonal trends** — 12-month view showing which months are your busiest
+- [x] **Holiday traffic patterns** — detect spikes around Christmas, Valentine's Day, Comic Con seasons, etc.
+- [x] **Post timing optimizer** — compare posts made at different times, show which performed better
+
+---
+
+**💰 Revenue & Conversion Analytics**
+
+- [x] **Revenue per post** — which specific photos, galleries, or posts generated tip/star/sale revenue
+- [x] **Revenue attribution** — which marketing channel (Instagram link, Google search, direct URL, email) led to the actual sale
+- [x] **Conversion funnel** — Viewer → Follower → Buyer (drop-off rates at each stage)
+- [x] **Average order value** over time
+- [x] **Revenue per viewer** — how much each unique viewer generates on average
+- [x] **Best-selling content** — which photos/videos have generated the most revenue (tips + prints + downloads)
+- [x] **Booking conversion rate** — of people who visit your booking page, what % actually book
+- [x] **Abandoned booking tracking** — visitors who started but didn't complete a booking (send re-engagement email)
+- [x] Collaborative project revenue tracking — earnings from revenue-sharing contracts (Module 20)
+
+---
+
+**📈 Growth & Audience Analytics**
+
+- [x] **Follower growth timeline** — chart of follows/unfollows over time with event markers (e.g., "this post caused +127 follows")
+- [x] **Profile visitor → follower conversion rate** — what % of profile visitors follow you
+- [x] **Follower source** — how did followers find you? (direct search, shared post, event page, looking for board)
+- [x] **Audience retention** — are followers still engaging 30/60/90 days after following?
+- [x] **Churn rate** — unfollows per week, with context ("you lost 12 followers the week you posted less frequently")
+- [x] **Reach vs. impressions** — unique viewers (reach) vs. total views including repeats (impressions)
+- [x] **Organic vs. cross-post reach** — views from within the platform vs. views driven by Instagram/Facebook/X cross-posts
+
+---
+
+**📱 Device & Technical Analytics**
+
+- [x] Device breakdown — Mobile / Desktop / Tablet (% split with trend over time)
+- [x] Operating system — iOS / Android / Windows / macOS / Other
+- [x] Browser breakdown — Safari / Chrome / Firefox / Samsung Browser / Other
+- [x] Screen resolution distribution (useful for optimizing photo display sizes)
+- [x] Connection type — WiFi vs. cellular (important for video quality decisions)
+- [x] Page load time — average load speed per page type (flag slow pages)
+
+---
+
+**🏆 Content Comparison & Benchmarking**
+
+- [x] **Head-to-head comparison** — select any two posts and compare all metrics side by side
+- [x] **Your best performers** — top 10 photos/posts/videos of all time, this month, this week
+- [x] **Content type performance** — do your cosplay posts outperform your portrait posts? Color-coded breakdown
+- [x] **Creator type benchmarking** (opt-in) — how does your engagement compare to similar creators in your category? (all anonymous, shown as percentile: "You're in the top 23% of photographers for engagement rate")
+- [x] **A/B testing** — post two versions of similar content on different days, platform helps compare performance
+
+---
+
+**🔔 Alerts & Notifications**
+
+- [x] **Trending alert** — push notification when a post hits 2x its normal view rate in under 1 hour
+- [x] **Milestone alerts** — "🎉 Your gallery just hit 10,000 views!" / "You reached 500 followers!"
+- [x] **Revenue alert** — "💰 You just earned $47 from tips and print sales today"
+- [x] **Booking spike alert** — "📅 3 people viewed your booking page in the last 10 minutes"
+- [x] **Superfan alert** — anonymous viewer has crossed your set threshold (e.g., 25+ profile visits)
+- [x] All alerts configurable — set thresholds, turn any off
+
+---
+
+**📬 Reporting & Exports**
+
+- [x] **Weekly email digest** — automated every Monday morning: top stats from the past week, highlights, tip of the week
+- [x] **Monthly performance report** — PDF + email: month-over-month comparison, top content, audience growth, revenue
+- [x] **Custom date range reports** — pull stats for any date range
+- [x] **CSV export** — download raw event data for your own analysis / QuickBooks / Excel
+- [x] **Goal tracking** — set goals (1,000 followers, $500/month revenue, 50 bookings this year) and track progress with visual progress bars
+- [x] **AI insights summary** — plain English explanation of your stats: *"Your Tuesday posts get 3x more engagement than Friday ones. Your audience in Texas converts to buyers at 4x the rate of your California viewers."*
+- [x] **Scheduled reports** — set reports to auto-send weekly, monthly, or quarterly to your email
+
+---
+
+**💾 Storage Management (same module)**
+- [x] Storage usage dashboard (per creator, per plan tier) — GB used vs. plan limit
+- [x] External storage connection — link your own S3, Backblaze B2, or Google Drive as overflow storage
+- [x] Backup & version history — restore deleted photos up to 90 days
+- [x] Bandwidth and download tracking — see how much CDN bandwidth your galleries consume
+- [x] Storage optimizer — flag duplicate files, unused galleries, low-res duplicates of high-res originals
+
+---
+
+
 
 ### 👤 Module 10 — Platform Admin & Accounts
 - [x] Photographer account with subscription billing (Free / Pro / Studio tiers)
