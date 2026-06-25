@@ -32,7 +32,8 @@
 │    Cosplayers, MUAs, Videographers, Fashion Designers, etc.     │
 │                                                                 │
 │  FREE: Supporters get social profiles (no website, no tools)    │
-│  PAID: Creators get social profile + dedicated website (below)  │
+│  FREE: Creator Free tier — limited tools, NO website            │
+│  PAID: Creator Pro/Studio/Enterprise — full tools + website     │
 └─────────────────────────────────────────────────────────────────┘
                               ↓ Included in paid Creator plans
 ┌─────────────────────────────────────────────────────────────────┐
@@ -2106,42 +2107,120 @@ enum CreatorType {
 
 ---
 
-**🔐 Three-Tier Access Model**
+**🔐 Five-Tier Access Model**
 
 ```
-TIER 1 — Creator (Paid Subscription)
+GUEST (no account)
 ──────────────────────────────────────
-Full platform access. Professional tools. Revenue earning.
-- Portfolio website (custom domain)
-- All gallery, booking, CRM, contract, invoice features
-- Post to global Creator Feed
-- Earn revenue (sales, tips, Stars, revenue sharing)
-- Lightroom/Photoshop plugins (Phase 3)
-- AI tools
+✅ View all public profiles, galleries, posts, events
+✅ Guest checkout (buy prints/downloads without account)
+❌ Cannot comment, tip, follow, or interact
+❌ No profile of any kind
 
-TIER 2 — Supporter / Fan (Free)
+SUPPORTER / FAN — Free (community member, NOT a creator)
 ──────────────────────────────────────
-Community access. Monetization participation. No pro tools.
-- Basic profile (name, photo, bio)
-- Follow creators / friend requests
-- View all public content
-- Comment, like, share posts
-- Join groups and community spaces
-- Chat with creators (if creator allows)
-- Send tips, Hearts & Stars ← revenue for creators
-- Purchase prints and digital downloads ← revenue for creators
-- Be tagged in event photos (face search + notifications)
-- Post in Fan/Community spaces (NOT creator global feed)
-- Upgrade path → Creator account when they turn professional
+For fans, followers, general public. No creator identity.
+✅ Social profile (name, photo, bio)
+✅ Follow creators, send friend requests
+✅ Comment, like, share, react to posts
+✅ Join groups and community spaces
+✅ Chat with creators (if creator allows)
+✅ Send tips, Hearts & Stars ← revenue for creators
+✅ Purchase prints and digital downloads
+✅ Be tagged in event photos (face search)
+✅ Post in fan / community spaces
+❌ No creator type designation
+❌ No professional tools of any kind
+❌ No dedicated website
+❌ No revenue earning
 
-TIER 3 — Guest (No Account)
+CREATOR FREE — Free (creator-identified, freemium)
 ──────────────────────────────────────
-View-only. Public content discovery.
-- View public profiles, galleries, posts, events
-- Guest checkout for prints/downloads
-- Cannot comment, tip, follow, or interact
-- "Join as Creator" and "Join as Fan" CTAs on every page
+For creators who aren’t ready to pay yet. Try before you buy.
+Limited professional tools. NO website. Higher commission.
+✅ Creator type designation (Photographer, Model, Fire Performer, etc.)
+✅ Social profile on main platform
+✅ Post to the creator global feed
+✅ Limited gallery upload (15 photos max, no RAW)
+✅ 2GB storage
+✅ Basic portfolio on social profile
+✅ Basic booking calendar (3 active slots at a time)
+✅ Basic CRM (5 active contacts)
+✅ Sell content / products (15% platform commission)
+✅ Receive tips and Stars
+✅ Post on Looking For board
+✅ TFP collaboration board access
+✅ Basic analytics (last 30 days only)
+❌ Platform watermark applied to shared content
+❌ NO dedicated website
+❌ NO craft-specific tools (no rider PDF, no comp card builder, etc.)
+❌ NO revenue-sharing contracts
+❌ NO full CRM / contracts / invoicing
+❌ NO AI tools
+❌ NO Lightroom / Photoshop plugin
+❌ NO API access
+Upgrade path → Creator Pro at any time (website activates instantly)
+
+CREATOR PRO — Paid (~$25/month)
+──────────────────────────────────────
+Full tools + dedicated website on platform subdomain.
+✅ Everything in Creator Free, plus:
+✅ Dedicated website: username.[platform].com
+✅ All craft-specific tools (comp card / rider PDF / flash manager / etc.)
+✅ 50GB storage
+✅ Unlimited gallery uploads
+✅ Full CRM (unlimited contacts, pipeline, invoicing, contracts)
+✅ Unlimited booking slots
+✅ Revenue-sharing contracts (Module 20)
+✅ Full analytics dashboard (all time, all metrics)
+✅ Platform watermark removed
+✅ 5% platform commission on sales
+✅ AI tools (bio writer, content generator, insights)
+✅ All post types (photo / video / reel / story / project / event)
+❌ No custom domain (subdomain only)
+❌ No multi-staff accounts
+❌ No API access
+
+CREATOR STUDIO — Paid (~$55/month)
+──────────────────────────────────────
+Pro + custom domain + advanced features.
+✅ Everything in Creator Pro, plus:
+✅ Custom domain: www.theircustomdomain.com
+✅ 500GB storage
+✅ 3% platform commission on sales
+✅ Priority support
+✅ Advanced analytics (audience demographics, revenue attribution)
+✅ Scheduled posts (queue posts in advance)
+✅ Email newsletter tool (send to follower mailing list)
+❌ No multi-staff accounts
+❌ No API access
+
+CREATOR ENTERPRISE — Paid (~$100+/month)
+──────────────────────────────────────
+For studios, agencies, troupes, talent companies.
+✅ Everything in Creator Studio, plus:
+✅ Multi-staff sub-accounts (up to 10 seats per account)
+✅ 2TB storage
+✅ 1% platform commission on sales
+✅ Public REST API access (Module 16)
+✅ Dedicated account manager
+✅ Custom contract terms
+✅ White-label option (remove platform branding from their website)
+✅ Priority AI processing queue
+✅ Advanced reporting (custom date ranges, PDF exports)
 ```
+
+---
+
+**💡 Creator Free Upgrade Triggers (what motivates the upgrade)**
+- Watermark on every photo they share publicly → looks unprofessional
+- Commission: 15% free vs 5% paid → every sale motivates upgrade
+- 15-photo limit fills up fast → immediate upgrade pressure
+- No website → can’t send clients a professional link
+- No craft-specific tools → comp card, rider, flash sales all locked
+- 3 booking slots → as soon as they start getting bookings, they hit the wall
+- 30-day analytics only → can’t see their full growth story
+- Upgrade happens instantly → website goes live the moment they subscribe
 
 ---
 
