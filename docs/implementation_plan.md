@@ -1463,5 +1463,432 @@ Push events to external systems the moment something happens:
 - [x] API changelog — documented breaking changes and deprecation notices
 - [x] Sandbox environment — full API access against dummy data, separate from real account
 
+---
+
+## 🏷️ Platform Naming Strategy
+
+> [!IMPORTANT]
+> The original name **"MyShutterHost"** was appropriate for a photography-only hosting platform. With the expansion to actors, models, cosplayers, fashion designers, and a full social network, the name no longer reflects the full vision. A rename should be considered before public launch.
+
+**The platform is now two things in one:**
+1. A **professional creative business platform** (portfolio, booking, CRM, contracts, payments, AI tools)
+2. A **creative professional social network** (feed, stories, events, collaboration, revenue sharing)
+
+**Naming approaches to evaluate:**
+| Direction | Concept | Example Names |
+|-----------|---------|--------------|
+| Creator + Community | The place where creatives connect | CreatorForge, CollabHive, CreativeBase |
+| Portfolio + Social | Show your work + build your network | ShowFrame, PortfolioHub, FrameWork |
+| Professional focus | Business tools for creative pros | ProCreator, StudioLink, CreatorPro |
+| Short & brandable | Clean, modern, memorable | Collabr, Foliohub, Creatify, Framr |
+
+**Recommended path:** Keep **MyShutterHost LLC** as the company/infrastructure name. Launch the creator social network under a new brand. Many companies do this (Alphabet → Google, Meta → Instagram).
+
+---
+
+### 🎨 Module 17 — Multi-Creator Platform Expansion
+
+> **Vision**: Expand from a photography-only platform to a full **creative professional ecosystem** serving all visual and performing arts. The core infrastructure (portfolio, booking, CRM, payments, galleries, social) is shared. Creator-type-specific features are layered on top via a `creatorType` field on the profile.
+
+---
+
+**🌐 Platform Identity Shift**
+
+```
+OLD: Photography SaaS hosting platform
+NEW: Creative Professional Social Network + Business Platform
+
+Serves: Photographers, Videographers, Models, Actors, Cosplayers,
+        MUAs, Fashion Designers, Photography Studios, Stylists,
+        Cinematographers, Art Directors, Set Designers, Talent Agencies,
+        and more — all in one ecosystem.
+```
+
+---
+
+**👥 Supported Creator Types**
+
+*Visual Capture:*
+- [x] **Photographer** — all existing features (core creator type)
+- [x] **Videographer / Filmmaker** — video projects, showreels, production credits, client video delivery
+- [x] **Cinematographer / DP** — gear list, production credits, reel hosting
+- [x] **Photography Studio** — multi-photographer accounts, studio rental, equipment list
+
+*Talent & Performance:*
+- [x] **Model** (fashion, commercial, fitness, glamour, plus-size, etc.)
+- [x] **Actor** — résumé, headshots, demo reel, credits, audition material
+- [x] **Cosplayer** — character portfolio, convention schedule, build journal, commission store
+- [x] **Dancer / Performer** — performance portfolio, class/workshop booking
+
+*Creative Support:*
+- [x] **MUA / Makeup Artist** — beauty portfolio, service menu, kit info, certifications
+- [x] **Stylist / Fashion Stylist** — look portfolios, brand collabs
+- [x] **Fashion Designer** — lookbooks, collections, pattern/digital sales, runway events
+- [x] **Art Director / Set Designer** — production case studies, set portfolio
+- [x] **Hair Stylist** — style portfolio, booking, service menu
+
+*Business:*
+- [x] **Talent Agency** — multi-talent roster, booking requests for represented talent
+- [x] **Brand / Business** — sponsor profiles, collab opportunities, advertising
+
+---
+
+**🔧 Creator-Type-Specific Features**
+
+*📸 Photography Studio:*
+- [x] Studio profile (separate from individual photographer)
+- [x] Multiple staff photographers under one studio account
+- [x] Studio space rental calendar (photographers book the space)
+- [x] Equipment rental list with availability
+- [x] Shared portfolio (work shot at/by the studio)
+- [x] Collective revenue dashboard
+
+*🎬 Videographer:*
+- [x] Showreel / demo reel hosting (Cloudflare Stream)
+- [x] Video project galleries (private client delivery links)
+- [x] Video download sales (4K, RAW footage packages)
+- [x] Production credit list (directed / shot / edited / produced)
+- [x] Behind-the-scenes photo galleries alongside video projects
+- [x] Production package pricing (wedding film / commercial / music video / doc)
+- [x] Client video approval workflow (client marks scenes approved)
+
+*👤 Model:*
+- [x] **Digital comp card** — industry-standard stats: height, measurements, eye/hair color, sizes, agency info
+- [x] **Tearsheet portfolio** — published work organized by brand/publication
+- [x] **Media kit** — downloadable PDF (comp card + portfolio highlights)
+- [x] Casting availability calendar — open dates for bookings
+- [x] Rate card — hourly/day/half-day rates by project type (editorial, commercial, fitness, etc.)
+- [x] Agency + agent info display
+- [x] "Book me" inquiry form on public profile
+
+*🎭 Actor:*
+- [x] **Digital résumé** — film/TV/theater/commercial credits, training, unions (SAG-AFTRA, AEA), special skills
+- [x] **Headshot gallery** — organized by type (commercial, theatrical, casual, character)
+- [x] **Demo reel hosting** — video reel with scene timestamps
+- [x] Audition material storage — sides, monologues (private)
+- [x] Credits list — IMDB-style filmography (role / project / year / director)
+- [x] Agent / manager display
+- [x] Commercial rate card
+- [x] IMDB link integration
+
+*🦸 Cosplayer:*
+- [x] **Character portfolio** — organized by franchise / series / universe
+- [x] **Convention schedule** — upcoming appearances with event links and booth/table info
+- [x] **Build journal / WIP blog** — document costume creation with photos + notes
+- [x] Commission store — sell prints, patterns, tutorial PDFs, prop replicas
+- [x] Fan interaction tools — autograph session scheduling, meetup times at conventions
+- [x] Costume stats — materials, build time, character origin
+- [x] Convention QR event card — specialized version of the photographer event card for con floors
+- [x] Heavy social integration — TikTok and Instagram as primary cross-post targets
+
+*💄 MUA / Makeup Artist:*
+- [x] Before/after portfolio — bridal, editorial, special FX, film/TV makeup
+- [x] Service menu — with pricing per service type
+- [x] Kit / product brand list
+- [x] Training and certification display
+- [x] On-location vs. studio booking toggle
+
+*👗 Fashion Designer:*
+- [x] **Lookbook galleries** — organized by collection (Spring 2026, Fall 2026, etc.)
+- [x] Collection release pages — with model credits, photographer credits
+- [x] Pattern and digital download sales (Etsy alternative)
+- [x] Fashion show / pop-up event posting
+- [x] Retailer and brand collaboration tracking (CRM-style)
+- [x] Wholesale inquiry form
+- [x] Press/tearsheet clips
+
+*🎬 Talent Agency:*
+- [x] Agency profile with represented talent roster
+- [x] Each talent links to their own individual creator profile
+- [x] Booking requests routed through agency
+- [x] Agency takes configurable commission % from bookings (CRM-tracked)
+
+---
+
+**⚙️ Technical Architecture — Creator Type System**
+
+```prisma
+enum CreatorType {
+  PHOTOGRAPHER
+  VIDEOGRAPHER
+  CINEMATOGRAPHER
+  PHOTOGRAPHY_STUDIO
+  MODEL
+  ACTOR
+  COSPLAYER
+  DANCER
+  MUA
+  HAIR_STYLIST
+  STYLIST
+  FASHION_DESIGNER
+  ART_DIRECTOR
+  SET_DESIGNER
+  TALENT_AGENCY
+  BRAND
+  OTHER
+}
+```
+
+- `PhotographerProfile` renamed → `CreatorProfile` with `creatorType` field
+- Dashboard sections show/hide based on creator type
+- Portfolio templates grouped by creator type
+- CRM pipeline stage terminology adapts per type ("sessions" / "castings" / "shoots" / "bookings")
+- Onboarding flow changes per creator type
+
+---
+
+**🔐 Three-Tier Access Model**
+
+```
+TIER 1 — Creator (Paid Subscription)
+──────────────────────────────────────
+Full platform access. Professional tools. Revenue earning.
+- Portfolio website (custom domain)
+- All gallery, booking, CRM, contract, invoice features
+- Post to global Creator Feed
+- Earn revenue (sales, tips, Stars, revenue sharing)
+- Lightroom/Photoshop plugins (Phase 3)
+- AI tools
+
+TIER 2 — Supporter / Fan (Free)
+──────────────────────────────────────
+Community access. Monetization participation. No pro tools.
+- Basic profile (name, photo, bio)
+- Follow creators / friend requests
+- View all public content
+- Comment, like, share posts
+- Join groups and community spaces
+- Chat with creators (if creator allows)
+- Send tips, Hearts & Stars ← revenue for creators
+- Purchase prints and digital downloads ← revenue for creators
+- Be tagged in event photos (face search + notifications)
+- Post in Fan/Community spaces (NOT creator global feed)
+- Upgrade path → Creator account when they turn professional
+
+TIER 3 — Guest (No Account)
+──────────────────────────────────────
+View-only. Public content discovery.
+- View public profiles, galleries, posts, events
+- Guest checkout for prints/downloads
+- Cannot comment, tip, follow, or interact
+- "Join as Creator" and "Join as Fan" CTAs on every page
+```
+
+---
+
+### 📱 Module 18 — Social Network (Feed, Stories & Social Graph)
+
+> **Vision**: A professional creative social network — Instagram's visual quality + Facebook's community features + LinkedIn's professional context. Creator Feed stays high quality (Creator accounts only). Fan spaces are open and welcoming. Cross-posting to Instagram/Facebook/X drives discovery without competing with them.
+
+---
+
+**📰 Post Types**
+- [x] **Photo post** — 1–20 photos, carousel format (like Instagram)
+- [x] **Video post** — short or long-form (Cloudflare Stream)
+- [x] **Text / status post** — thoughts, announcements, behind-the-scenes notes
+- [x] **Story** — 24-hour disappearing photo or video (like Instagram Stories)
+- [x] **Project post** — linked to a collaborative shoot, shows all contributors with credits
+- [x] **Event post** — creates a calendar event AND a feed post simultaneously
+- [x] **Reel / showcase** — curated highlight post (feature your best work)
+
+**📰 Feed Types**
+- [x] **Personal wall** — your own profile's posts (public or private per post)
+- [x] **Following feed** — posts from creators and supporters you follow (chronological)
+- [x] **Global Creator Feed** — all public posts from Creator accounts (algorithm-ranked)
+- [x] **Discovery Feed** — curated top content, visible to guests (no login required)
+- [x] **Creator Type Feed** — filter global feed by creator type (only photographers, only models, etc.)
+- [x] **Local Feed** — posts from creators near your location
+- [x] **Fan / Community Feed** — posts from Supporter accounts in community spaces
+
+**🔒 Post Visibility**
+- [x] Public — anyone can see (including guests)
+- [x] Followers only — only people who follow you
+- [x] Friends only — mutual connections
+- [x] Private — only you
+
+**🔄 Social Graph**
+- [x] **Follow** (one-way — like Instagram): follow anyone public
+- [x] **Friend / Connect** (mutual — like Facebook/LinkedIn): send + accept request
+- [x] **Fan** relationship — public Supporter follows a Creator (consumer-side)
+- [x] **Collaborator** badge — system-tracked, verified shoot partner (has a signed contract together)
+- [x] Block and mute controls
+
+**💬 Post Interactions**
+- [x] Likes / reactions (customizable reaction set — ❤️ 🔥 👏 💯 ✨)
+- [x] Comments (threaded replies)
+- [x] Share to feed / share to story
+- [x] Save to private collection
+- [x] Tag another creator in the post
+- [x] Tag a shoot / project (links to collaborative contract)
+- [x] Send tips or Stars directly on a post
+- [x] Buy prints directly from a photo post
+
+**📤 Cross-Platform Auto-Posting**
+- [x] Connect Instagram, Facebook, X/Twitter, TikTok, Pinterest accounts in settings
+- [x] When posting, toggle which platforms to cross-post to
+- [x] Every cross-posted item includes a link back to the creator's profile on the platform
+- [x] Cross-post preview — see how the post will look on each platform before publishing
+- [x] Scheduled posting — set a date/time to auto-publish
+- [x] Cross-post analytics — see engagement from each external platform
+
+**📖 Stories**
+- [x] 24-hour disappearing photo or video stories (like Instagram Stories)
+- [x] Story highlights — save stories to permanent highlight albums on your profile
+- [x] Story reactions — viewers react with emojis
+- [x] Link sticker in stories — link to gallery, booking page, or external URL
+- [x] "Swipe up" equivalent — direct link from story to purchase/booking
+
+---
+
+### 📅 Module 19 — Event Calendar, Discovery & "Looking For" Board
+
+> **Vision**: The central hub where creative collaborations are born. Creators post opportunities, the platform intelligently notifies the right people, and the community discovers events happening near them.
+
+---
+
+**📅 Public Event Calendar**
+- [x] Any Creator account can post an event
+- [x] Event types:
+  - Styled shoot (photographer + model + MUA + etc.)
+  - Mini session (booking slots with calendar)
+  - Convention / cosplay event appearance
+  - Fashion show or runway event
+  - Workshop or masterclass
+  - Open casting call
+  - Brand activation or sponsored event
+  - TFP shoot (free collaborative shoot)
+  - Paid shoot posting
+- [x] Event posts appear in both the social feed AND the public event calendar simultaneously
+- [x] Global calendar view (searchable by date / location / event type / creator type needed)
+- [x] Map view — see events near me
+- [x] RSVP / "I'm interested" on any event
+- [x] Calendar subscription — iCal feed of events you've RSVP'd to
+- [x] Featured events — promoted placement for paid plan creators
+
+**🔍 "Looking For" Board**
+
+A dedicated casting and collaboration board — the professional upgrade of Craigslist for creatives:
+
+- [x] **Post a listing:**
+  - "Photographer seeking model for cosplay styled shoot — TFP — Austin TX — Jul 15"
+  - "Model available for paid commercial work — NYC — flexible dates"
+  - "MUA seeking photographers to build portfolio — open to TFP — Dallas"
+  - "Fashion designer seeking model and videographer for lookbook — paid"
+- [x] Listing types: SEEKING (you need someone) / AVAILABLE (you're offering yourself)
+- [x] Compensation: TFP / Paid ($ amount or range) / Negotiable
+- [x] Listing expires automatically (set duration: 7 / 14 / 30 days)
+- [x] Filter board by: creator type needed, location, compensation type, date
+- [x] Apply / Express interest button → sends message to poster
+- [x] Listings linked to event (a styled shoot event can have a "still seeking MUA" tag)
+
+**🔔 Smart Notification Engine**
+
+The platform connects the right people automatically:
+
+- [x] Creator sets "Availability Status" on their profile:
+  - Available for TFP work
+  - Available for paid work
+  - Not currently taking new work
+  - Available at specific dates only
+- [x] Creator sets "Looking for" preferences:
+  - Creator types they want to collaborate with
+  - Compensation types they accept (TFP / paid / both)
+  - Location radius (e.g. within 50 miles)
+  - Frequency of notifications (instant / daily digest / weekly)
+- [x] When a matching event or listing is posted → notify the creator
+- [x] Example: Model in Austin set to "available for TFP + paid, seeking photographers" → gets notified when any Austin photographer posts a styled shoot
+- [x] Suppress duplicates — smart deduplication so creators aren't bombarded
+- [x] Notification channels: in-app, email, push notification (mobile)
+
+**🗺️ Creator Discovery Map**
+- [x] Browse a map of creators near any location
+- [x] Filter by creator type, availability status, specialties
+- [x] Useful for events (who's a photographer in Las Vegas for LVCC?)
+- [x] Useful for clients (who's a photographer in my city?)
+
+---
+
+### 💰 Module 20 — Collaborative Revenue Sharing
+
+> **Vision**: "The contract follows the content, and the money follows the contract." When multiple creators collaborate on a shoot, they agree on revenue splits upfront. Every dollar earned from that content — tips, Stars, prints, downloads — automatically splits to all contributors via Stripe. No manual math. No awkward conversations.
+
+---
+
+**🤝 Collaborative Shoot Contract**
+- [x] Any Creator initiates a "Collaborative Project"
+- [x] Invites participants by platform username or email
+- [x] Each participant declares their role: Photographer / Videographer / Model / MUA / Stylist / Fashion Designer / Hair Stylist / Other
+- [x] Revenue split percentages agreed upon (must total 100%)
+- [x] All participants e-sign the collaborative contract (using our existing e-signature system)
+- [x] Contract locked once all parties sign — percentages cannot be changed after signing
+- [x] Contract stores: project name, shoot date, location, participants, splits, content rights
+
+**📸 Content Tagging**
+- [x] Photos and videos uploaded from the shoot are tagged to the collaborative contract
+- [x] Photographer tags images: "This photo is from [Shoot Name]"
+- [x] Tagged content shows all contributors with credits in a "Credits" section on the post
+- [x] Contributors are notified when content from their shoot is posted
+- [x] Content retains contract link permanently — even if reshared
+
+**💸 Revenue Splitting — How It Works**
+
+```
+Example: Styled fashion shoot
+  Photographer:    40%
+  Fashion Designer: 25%
+  Model:           20%
+  MUA:             10%
+  Hair Stylist:     5%
+  ─────────────────────
+  Total:          100%
+
+Fan tips $20 on a photo from this shoot:
+  Platform fee (10%):           $2.00
+  Remaining for distribution:   $18.00
+  Photographer receives:        $7.20  (40%)
+  Fashion Designer receives:    $4.50  (25%)
+  Model receives:               $3.60  (20%)
+  MUA receives:                 $1.80  (10%)
+  Hair Stylist receives:        $0.90  (5%)
+
+All splits happen automatically via Stripe Connect Transfer Groups.
+No manual calculations. No waiting. Instant distribution.
+```
+
+- [x] Tips on a post → split per contract percentages → Stripe transfer group
+- [x] Stars/Hearts micropayments → split per percentages → credited to each wallet
+- [x] Print sale from a collaborative photo → split after platform fee + lab/shipping costs
+- [x] Digital download sale → split after platform fee
+- [x] Each creator sees revenue from every collaborative project in their dashboard
+
+**📊 Revenue Dashboard — Collaborative View**
+- [x] Per-project revenue breakdown (how much each shoot has earned over time)
+- [x] Individual earnings per shoot (my share from each project)
+- [x] Content performance (which collaborative photo earns the most)
+- [x] Contributor leaderboard (within a project — whose posts drove the most revenue)
+- [x] Payout history per project
+- [x] Tax summary per project (for accounting)
+
+**⚖️ Rules & Edge Cases**
+- [x] Revenue sharing requires ALL participants to have Creator accounts (or be invited — they have 30 days to create an account or their share goes to escrow)
+- [x] Escrowed funds held 90 days — if unclaimed, redistributed proportionally to other signatories
+- [x] Content can only earn split revenue if a signed contract exists — prevents disputes
+- [x] Creator can post shoot content without revenue sharing (if no collaborative contract was created)
+- [x] Photographer always controls what content is posted — collaborators don't get upload access
+- [x] Dispute resolution: if a participant disputes a split, content revenue is paused pending resolution (admin review)
+- [x] Minimum payout threshold: $10 (splits under $10 accumulate until threshold reached)
+
+**🔗 Integration with Existing Systems**
+- [x] Uses existing e-signature contract system (Module 4)
+- [x] Uses existing Stripe Connect (Module 2) — transfer groups handle multi-party splits
+- [x] Uses existing Stars/Hearts/Tips system (Module 2)
+- [x] Linked to CRM — each collaborative shoot appears in CRM as a multi-participant session
+- [x] Linked to social feed — project posts show contributor credits automatically
+- [x] Revenue webhooks — external tools (QuickBooks via Module 16 API) receive split payment events
+
+---
+
+
+
 
 
