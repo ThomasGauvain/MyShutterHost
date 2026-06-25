@@ -1377,3 +1377,285 @@ Photographers, Videographers, Event Producers, Festival Organizers, Venues
 Photographers (nail photography is its own specialty genre — macro lenses, ring lights, hand styling), Content Creators (product collabs), Nail Product Brands (ambassador deals), Other Nail Techs (education, referrals, guest techs)
 
 ---
+
+---
+
+## 📝 Screenwriter / Script Writer
+
+**The Problem**: Screenwriters have no professional platform. They write in Final Draft, store scripts in Google Drive, submit through Coverfly or The Black List, pitch via email, and have zero unified professional presence. Their work is completely invisible until it gets produced — which means the people who need to discover them (directors, producers) have no way to find them. They are the most underserved creative professional in existence.
+
+**Dashboard Unique Sections**
+- Script library (organized by format: short / feature / TV pilot / web series / limited series / spec)
+- Script status tracker (Spec / Available / Under Option / In Development / Produced / Shelved)
+- Pitch deck builder (logline + synopsis + tone board + comparable films + character breakdown)
+- WGA / copyright registration badge display
+- Table read event creator (invite actors from the platform to read a script)
+- Script optioning and sale workflow (discovery → inquiry → negotiation → contract → payment)
+- Writing contest and fellowship tracker
+- Script coverage offer manager (sell professional script notes to other writers)
+- Co-writer collaboration tools
+- Development journal (private draft notes and revision history per script)
+
+**Website Pages**
+- `/` — Bio, latest logline, representation info, writing credits, CTA
+- `/scripts` — Public script library (loglines, genre tags, format, page count, status — browseable by directors and producers)
+- `/script/:title` — Individual script page: logline, full synopsis, genre/format/tone, comparable films, director's inquiry form, character breakdown, pitch deck download (gated)
+- `/table-reads` — Upcoming table read events (open invite to actors on platform)
+- `/about` — Bio, credits, representation info, awards and fellowships won
+- `/workshops` — Writing workshop and coaching session booking
+- `/coverage` — Script coverage service (offer professional notes to other writers — paid service)
+- `/contact` — Director and producer outreach / commission inquiries
+
+**Unique Tools**
+
+*Script Management*
+- **Script library organizer** — tag each script by: format (short / feature / pilot / web series), genre (drama / thriller / comedy / horror / sci-fi / etc.), status, page count, logline
+- **Script status system** — Spec → Available → Under Option → In Development → Produced → Shelved (each status changes what's visible on their public page)
+- **Protected script viewer** — directors and producers can request to read the full script; it displays in a watermarked PDF viewer (readable but not downloadable until optioned)
+- **Logline discovery page** — public loglines visible to any director or producer browsing platform scripts without exposing the full work
+
+*Pitching & Development*
+- **Pitch deck builder** — logline + one-page synopsis + tone board (mood images, color palette, visual references) + comparable films ("this is like X meets Y") + character breakdown
+- **Tone board builder** — curate visual references for a script (images, colors, music — helps directors visualize the world)
+- **Comparable films display** — "This script is in the tradition of [Film A] and [Film B]" — industry-standard pitch element
+- **Character breakdown per script** — list all roles (name / age range / brief description / SAG or non-union) so actors can browse and self-submit for table reads or early interest
+
+*Optioning & Revenue*
+- **Script optioning workflow** — a director or producer clicks "Option This Script" → structured negotiation flow → option agreement generated → Stripe payment for the option fee → option period tracked with expiry reminder
+- **Script sale workflow** — outright purchase (full transfer of rights) — same flow as optioning but without expiry
+- **Option period tracker** — shows writer when an option expires so they can re-market the script if not exercised
+
+*Community & Education*
+- **Table read event creator** — create a reading event (in-person or virtual via platform video), invite actors from the platform by creator type, set a public or invite-only status
+- **Writing contest tracker** — log submissions to Nicholl Fellowship, Austin Film Festival, PAGE Awards, etc. with status (submitted / shortlisted / finalist / winner)
+- **Script coverage service** — create a paid offering for professional script notes; other platform writers hire them for feedback
+- **Co-writer collaboration** — invite another screenwriter on the platform to co-develop a script (shared development journal, credit split agreement)
+- **WGA / copyright registration badge** — display registration date and registration number as a trust badge
+
+**Revenue Streams**
+- Script option fees (upfront payment for exclusive development rights for a set period)
+- Script outright sales
+- Writing workshop and coaching sessions
+- Script coverage fees (professional notes sold to other writers)
+- Ghost writing commissions (write a script for someone else)
+- Table read ticket sales (optional ticketed events)
+- Speaking and panel appearance fees
+
+**CRM Pipeline**
+`Script Completed → Polish Draft → Registered / Protected → Available → Inquiry Received → Pitch / Coverage Discussion → Option Negotiation → Option Signed → Development Phase → Produced`
+
+**Looking For**
+Film Directors (to option and develop their scripts), Film Producers (to finance and produce), Actors (for table reads and early interest), Other Screenwriters (writing partnerships and writers room), Script Coverage Readers
+
+---
+
+## 🎬 Film Director / Indie Filmmaker
+
+**The Problem**: Independent film directors have no professional home. Vimeo hosts films but has no community. Film Freeway tracks festivals but has no portfolio. Instagram has social but no professional tools. Nothing connects directors with their cast and crew, shows the full production journey from script to screen, tracks their festival career, and lets fans follow along as a film gets made.
+
+**Dashboard Unique Sections**
+- Film portfolio (completed films with streaming, credits, festival laurels)
+- Production project manager (multi-phase project lifecycle tracking)
+- Crew call board (post specific roles needed for current productions)
+- Cast call board (post character breakdowns for actors to audition)
+- Film festival submission tracker (with laurel display)
+- Production blog manager (document the making-of as it happens)
+- Crowdfunding campaign manager (fan-fund a production)
+- Script browser (browse available scripts from platform screenwriters)
+- Film credit aggregator (tag cast/crew from their creator profiles)
+- Commission intake manager (brands and musicians hire them to direct)
+
+**Website Pages**
+- `/` — Director's reel + hero film, bio, notable credits, current project teaser
+- `/films` — Completed film portfolio (short films / music videos / branded content / features)
+- `/film/:title` — Individual film page: stream or embed, full cast and crew credits (linked to their creator profiles), synopsis, director's statement, festival laurels display, BTS gallery
+- `/in-development` — Projects currently in production with live production blog
+- `/about` — Bio, directing philosophy and style, influences, awards and recognition
+- `/crew-call` — Active crew calls for current productions (public board)
+- `/scripts` — Scripts currently in development or seeking (from platform writers)
+- `/contact` — General inquiry / script submissions / commission inquiries
+
+**Unique Tools**
+
+*Production Management*
+- **Production project manager** — full lifecycle view per project:
+  - `Development` (script, funding, team assembly)
+  - `Pre-production` (casting, crew, locations, schedule)
+  - `Principal Photography` (shooting days, call sheets)
+  - `Post-production` (edit, color, sound, VFX, music)
+  - `Festival Circuit` (submissions, screenings, laurels)
+  - `Distribution` (streaming, broadcast, theatrical)
+  - `Archived`
+- **Production blog** — public or follower-only making-of blog (text + photos + video clips) that posts to the director's social feed as they go, building audience *during* production before the film even exists
+- **Production budget tracker** — line-item micro-budget tool (departments, actuals vs. budgeted, variance display)
+- **Call sheet generator** — daily shooting schedule: scenes to film, locations, individual cast and crew call times, meal breaks — generates a shareable PDF for the cast and crew
+
+*Crew & Cast*
+- **Crew call board** — post specific crew roles needed:
+  - DP / Cinematographer
+  - Sound Recordist / Boom Operator
+  - Gaffer / Lighting
+  - Key Grip
+  - Script Supervisor
+  - Production Designer / Art Director
+  - Costume Designer
+  - Colorist (post)
+  - Editor (post)
+  - Composer / Scorer
+  - VFX Artist
+  - Production Assistant
+- **Cast call board** — post character breakdowns (role name / age range / brief description / union status) → actors on platform submit audition self-tapes directly
+- **Self-tape audition inbox** — receive and review actor self-tape submissions per role per production
+- **Film credit aggregator** — tag cast and crew by their creator profiles; credit auto-populates on both the film's page AND each collaborator's own creator profile (they get the credit too)
+
+*Festival & Distribution*
+- **Film festival submission tracker** — log submissions: festival name / submission date / status (pending / shortlisted / official selection / award won)
+- **Festival laurel display** — official selection and award laurel images displayed on the film's page (like a real festival poster)
+- **Director's statement per film** — formatted written statement attached to each film (required for most festival submissions)
+- **Streaming hub per film** — all distribution links in one place (Vimeo / YouTube / Mubi / MUBI / Criterion Channel / festival platforms)
+
+*Discovery & Revenue*
+- **Script browser** — browse available scripts posted by platform screenwriters (filter by genre / format / length)
+- **Commission intake form** — structured inquiry form for brands and musicians who want to hire them to direct a music video or branded short film
+- **Crowdfunding campaign** — fan-backed funding: backer tiers, reward descriptions (exclusive BTS / credit / screening invite), progress bar, deadline
+- **Collaborator search** — search platform creators by type and location (find a DP in Chicago for a shoot next month)
+- **Tone board per project** — visual reference board for each film in development (share with prospective collaborators to communicate the vision)
+
+**Revenue Streams**
+- Directing fees (freelance direction — music videos, branded content, short films)
+- Music video commissions from musicians on the platform
+- Branded short film and commercial direction
+- Festival prize money (tracked in the platform)
+- Crowdfunding from fans
+- Film licensing and distribution deals
+- Workshop and masterclass teaching
+- Online directing course sales
+
+**CRM Pipeline**
+`Commission / Script Inquiry → Brief or Script Development → Budget and Contract → Pre-production → Principal Photography → Post-production → Delivery or Festival Submission → Distribution → Archived`
+
+**Looking For**
+Screenwriters (scripts to direct), Cinematographers / DPs, Sound Recordists, MUAs, Costume Designers, Actors (leads and supporting), Musicians (for scoring), Composers, Production Designers, Colorists, Editors, Locations / Venues, Producers
+
+---
+
+## 🎥 Film Producer / Line Producer
+
+**The Problem**: Film producers manage the business infrastructure of productions — money, schedules, contracts, crew — but no platform handles both their creative portfolio (produced films) and the business tools of running a production. They live across spreadsheets, email, scheduling software, and accounting tools with nothing connecting it all.
+
+**Dashboard Unique Sections**
+- Production slate (all current and past projects with lifecycle status)
+- Crew roster per production (who is contracted for each project)
+- Production budget tracker (detailed line items, actuals vs. budgeted)
+- Call sheet generator (daily shooting schedules per production)
+- Distribution tracker (which platforms, distributors, and festivals hold each film)
+- Release and clearance tracker (music licenses, location releases, talent releases)
+- Finance tracker (invoices in and out per production)
+- Production contract template manager (crew agreements, talent agreements, location releases)
+
+**Website Pages**
+- `/` — Production company name / logo, current slate teaser, notable produced credits, CTA
+- `/slate` — Full production slate organized by status (In Development / In Production / Post / Released / Archived)
+- `/film/:title` — Individual film page (same format as director — shared film pages between director and producer)
+- `/about` — Bio, production company history, specialty (short film / music video / commercial / indie feature / documentary)
+- `/services` — What they offer as a service: full production services / line producing / EP services / producing consulting
+- `/contact` — Project and partnership inquiries
+
+**Unique Tools**
+
+*Production Infrastructure*
+- **Production slate manager** — organize all projects by status; each project links to its full production detail view
+- **Crew roster per production** — track who is contracted and confirmed for each project (role / name / start date / fee / contract status)
+- **Call sheet generator** — daily shooting schedule: scene numbers, locations, individual actor and crew call times, meal breaks, special equipment notes — generates a PDF distributed to all cast and crew
+- **Production budget tracker** — line-item budget tool:
+  - Department breakdown (camera / sound / lighting / art / wardrobe / location / post / music / contingency)
+  - Actuals vs. budgeted with variance flagging
+  - Running total spend display
+  - Simple cash flow view
+- **Finance tracker** — invoices issued to clients, invoices received from crew/vendors, payment status per item, per-production P&L view
+
+*Legal & Clearances*
+- **Release and clearance tracker** — log every clearance required per production:
+  - Talent releases (signed / unsigned per cast member)
+  - Location releases (confirmed / pending)
+  - Music licenses (licensed / pending / rejected)
+  - Archival footage licenses
+  - Brand/product clearances
+- **Production contract templates** — standard agreements pre-built and customizable:
+  - Crew deal memo
+  - Actor agreement (SAG low-budget / non-union)
+  - Location release
+  - Music sync license request
+  - NDA (for script protection pre-production)
+
+*Distribution & Portfolio*
+- **Distribution tracker** — which distributors, streaming platforms, and festivals currently hold each finished film, with deal terms and expiry dates
+- **Production company portfolio** — produced films displayed as a slate on their public website with links to each film's full page
+- **Co-production display** — show other production companies co-produced with (credibility for partnership)
+
+**Revenue Streams**
+- Producer fee per production
+- Executive Producer credits on films
+- Production company overhead and commission
+- Line producing service fees (hired by other directors / companies)
+- Post-production coordination fees
+- Producing consulting and mentorship
+
+**CRM Pipeline**
+`Script or Brief In → Budget Development → Financing Secured → Pre-production → Principal Photography → Post-production → Distribution / Festival → Archved`
+
+**Looking For**
+Film Directors (projects to produce), Screenwriters (scripts to develop and produce), Investors and Co-producers, Distributors and Sales Agents, All crew and cast types
+
+---
+
+## 🎞️ Film Community Platform Features
+
+> These are not creator types but platform-wide community features specifically designed for the indie film and short film community. They live on top of the social network layer and connect all creator types through the shared language of film production.
+
+**48-Hour Film Challenge**
+- Special event type created by any director or community group
+- Teams form through the platform (directors recruit from all creator types)
+- On start: genre, prop, line of dialogue, and character name assigned randomly to all teams
+- 48-hour countdown visible on the event page
+- Teams post production blog updates during the shoot
+- Submissions uploaded to the platform at deadline
+- Community votes or judge panel rates submissions
+- Winners displayed on the event page with laurels
+- All participants get a "48-Hour Film Challenge" credit on their profiles
+
+**Table Read Event**
+- Created by a screenwriter or director
+- Script shared securely with confirmed participants only
+- Roles assigned to invited actors (from platform)
+- In-person or streamed live on the platform (like a premiere but for an unproduced script)
+- Can be public (open audience) or invite-only
+- Optional ticketing (audience pays to attend/watch)
+- Post-read: writer gets actor feedback, actors get a credit for participating
+
+**Short Film Premiere / Watch Party**
+- Director streams the film's world premiere to their followers
+- Live chat alongside the film
+- Cast and crew are tagged — their follower feeds get invited
+- Q&A session after the screening (live video)
+- Audience reaction data collected (watch duration, reactions, comments)
+- Replay available for followers who missed it
+
+**Film Club Groups**
+- Community spaces organized around:
+  - Genre (horror / sci-fi / drama / documentary / animation)
+  - Technique (cinematography / screenwriting / editing / sound design)
+  - Budget level (micro-budget / no-budget / short film)
+  - Regional / local filmmaking communities
+- Groups can host their own 48-hour challenges, table reads, and watch parties
+- Members share work-in-progress cuts for peer feedback
+- Weekly or monthly discussion threads
+
+**Production Crew Call Board (platform-wide)**
+- Enhanced version of the Looking For board specifically for film productions
+- Tagged with specific crew roles (DP / Sound / Gaffer / Colorist / Composer / Editor / PA / etc.)
+- Linked to a specific production project (so crew know what they are applying for)
+- Actors can respond to cast calls directly
+- Crew can respond to crew calls directly
+- Director receives applications in their dashboard with applicant's full creator profile attached
+- All successful crew connections generate a production credit on both the production's page and the crew member's profile
