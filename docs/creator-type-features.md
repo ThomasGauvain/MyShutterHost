@@ -1268,3 +1268,112 @@ Photographers, Videographers, Event Producers, Festival Organizers, Venues
 | Photography Studio | — | — | — | — | ✅ Hosting | — | — | ✅ Staff |
 | Talent Agency | — | — | — | — | — | — | — | ✅ Commission |
 | Performance Troupe | ✅ Group | — | ✅ Combined | ✅ Group merch | — | — | ✅ (if applicable) | ✅ Members |
+
+---
+
+## 💅 Nail Technician
+
+**The Problem**: Instagram is the primary portfolio tool but the algorithm buries nail content unpredictably. Vagaro, Booksy, and StyleSeat handle appointments but are generic salon tools — none of them track fill schedules, client nail profiles, custom press-on orders, or nail art specialties. Nail art is a highly visual creative discipline with a massive online following and zero professional platform built specifically for it.
+
+**Dashboard Unique Sections**
+- Nail art portfolio organized by style / technique
+- Service menu builder (nail-specific services with duration and add-on pricing)
+- Client nail profile tracker (nail condition, shape preferences, service history, product sensitivities — private per client)
+- Fill reminder system (automated re-booking prompts sent 2–3 weeks after fills)
+- Press-on nail custom order store (measure, design, ship custom sets)
+- Inspo board manager (gallery of styles they can recreate — helps clients choose designs)
+- Nail tech license display
+- Product and brand list (what gel, acrylic, and polish brands they use)
+- Add-on pricing calculator
+
+**Website Pages**
+- `/` — Hero nail art gallery (close-up, high-detail shots), services overview, book CTA
+- `/portfolio` — Full nail art gallery filterable by style
+- `/gel` `/acrylic` `/nail-art` `/press-ons` `/bridal` — Service / specialty subpages
+- `/services` — Full service menu with duration, pricing, and add-on options
+- `/booking` — Appointment booking (service type → add-ons → date / time → deposit)
+- `/press-ons` — Custom press-on nail store (measurements form + design consultation → ship worldwide)
+- `/inspo` — Inspiration board of styles they can recreate (helps clients come prepared with a vision)
+- `/about` — Bio, training, nail tech license, brands used, specialty styles
+- `/aftercare` — Nail aftercare instructions page (shareable link sent post-appointment)
+- `/contact` — General inquiry
+
+**Unique Tools**
+
+*Portfolio & Gallery*
+- **Nail art gallery** — high-resolution close-up shots with pinch-to-zoom on mobile (nail detail is everything)
+- **Style tag system** — tag every set by technique and aesthetic:
+  - Minimalist / clean
+  - Detailed nail art (hand-painted)
+  - Floral / botanical
+  - Abstract / geometric
+  - French / ombré
+  - Chrome / mirror / metallic
+  - Glitter / foil / holographic
+  - 3D nail art (charms, gems, sculpted)
+  - Character / themed
+  - Seasonal / holiday
+  - Bridal / occasion
+  - Negative space
+  - Press-on sets
+- **Inspo board** — separate gallery of designs they can recreate (clients screenshot and bring to their appointment)
+
+*Service & Booking*
+- **Nail service menu builder** — nail-specific service types with built-in duration presets:
+  - Full set (acrylic / gel / polygel / dip powder)
+  - Fill / maintenance (2-, 3-, or 4-week fill)
+  - Gel manicure
+  - Classic manicure
+  - Pedicure (classic / spa / gel)
+  - Nail art (priced per nail or per full set)
+  - Chrome / specialty finish add-on
+  - Press-on set (in-salon fitting or shipped)
+  - Nail repair (per nail)
+  - Soak-off / removal
+- **Add-on pricing calculator** — base service + nail art per nail + chrome + gems → auto-totals at booking
+- **Nail shape selector** — visual tool showing nail shapes (square / round / coffin / almond / stiletto / ballerina / squoval) — clients pick their preferred shape at booking time
+- **Nail length selector** — visual guide (short / medium / long / extra long) shown at booking
+
+*Client Profiles*
+- **Client nail profile** (private per client — never shown publicly):
+  - Natural nail condition (healthy / weak / brittle / bitten / damaged)
+  - Preferred nail shape and length
+  - Service history (what product type was applied at last visit — critical for fills)
+  - Product sensitivities or known allergies (important for safety)
+  - Preferred color families or gel polish brands
+  - Notes from previous appointments
+- **Fill reminder system** — automated message sent to client 2–3 weeks after their appointment ("Time for a fill? Book your next appointment →")
+- **Re-book nudge** — follow-up prompt sent after removal or soak-off ("Ready for a fresh set?")
+
+*Business & Revenue*
+- **Press-on custom nail store** — clients order custom hand-painted press-on sets:
+  - Client submits nail size measurements
+  - Selects design (from inspo board or custom description)
+  - Pays deposit → nail tech builds → ships
+  - Full e-commerce flow (sizing guide, shipping options, tracking)
+- **Nail tech license display** — state / country license number displayed as trust badge on website
+- **Product and brand list** — what products they use (OPI, CND, Gelish, Aprés, Kiara Sky, Young Nails, etc.) — clients care about product quality
+- **Nail photography optimization** — platform displays nail photos with close-up detail mode enabled by default (different from standard gallery)
+
+*Affiliate & Education*
+- **Product affiliate links** — link to nail gel brands, tools, and supplies they recommend (earn commission)
+- **Tutorial video store** — sell nail art tutorials (how to do ombré, how to sculpt, etc.)
+- **Nail art class / workshop booking** — teach in-person or virtual nail art workshops
+
+**Revenue Streams**
+- Appointment fees (full sets, fills, gel manis, pedicures, nail art)
+- Add-on charges (per-nail art, chrome, gems, 3D elements)
+- Custom press-on nail orders (ship worldwide — passive income stream)
+- Product affiliate commissions (gel brands, nail tools, supplies)
+- Tutorial video sales (how-to nail art content)
+- Workshop / class teaching (in-person and virtual)
+- Brand ambassador deals (nail product brands)
+- Virtual nail consultation (design advice before booking)
+
+**CRM Pipeline**
+`Inquiry → Service + Add-ons Selected → Appointment Booked → Deposit Collected → Reminder Sent (3 days before) → Appointment → Aftercare Instructions Sent → Fill Reminder (2–3 weeks) → Re-book`
+
+**Looking For**
+Photographers (nail photography is its own specialty genre — macro lenses, ring lights, hand styling), Content Creators (product collabs), Nail Product Brands (ambassador deals), Other Nail Techs (education, referrals, guest techs)
+
+---
