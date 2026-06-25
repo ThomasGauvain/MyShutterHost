@@ -1,57 +1,116 @@
-# MyShutterHost — Full Implementation Plan v2
+# [Platform] — Full Implementation Plan v3
 
-A professional SaaS photography hosting platform — think Zenfolio + SmugMug + Pixieset, but more powerful and fully your own.
+> **Note on name**: Originally "MyShutterHost" — a photography hosting platform. The vision has expanded significantly. See the Platform Naming Strategy section. This plan now describes a full **creative professional social network + business platform** serving 16+ creator types.
 
 ---
 
-## 🏗️ Two Distinct Products — Important Architecture Note
+## 🏗️ Three Distinct Products — Platform Architecture
 
 > [!IMPORTANT]
-> MyShutterHost is TWO separate products sharing one codebase (monorepo).
+> The platform is THREE interconnected products sharing one codebase (monorepo) and one backend.
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│  PRODUCT 1: MyShutterHost.com                             │
-│  (The platform's own public-facing website)               │
-│                                                           │
-│  • Marketing landing page + pricing                       │
-│  • Photographer signup & subscription purchase            │
-│  • Tech support & bug reporting                          │
-│  • Changelog & update notes                              │
-│  • Public roadmap & feature suggestions                  │
-│  • Planned maintenance / downtime notices                │
-│  • Platform status page (is the service up?)             │
-│  • Platform blog / photography tips                      │
-└────────────────────────────────────────────────────────────┘
-                          ↓ Subscribes
-┌────────────────────────────────────────────────────────────┐
-│  PRODUCT 2: Photographer's Hosted Website                 │
-│  (What subscribers get — their own site on the platform)  │
-│                                                           │
-│  • photographer.myshutterhost.com  (free tier)           │
-│  • www.theirownbrand.com           (paid tier)           │
-│                                                           │
-│  • Their portfolio galleries + store                     │
-│  • Their booking calendar + contracts                    │
-│  • Their client galleries + proofing                     │
-│  • Their WYSIWYG-customized website                      │
-│  • Everything in Modules 1–14 of this plan               │
-└────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│  PRODUCT 1: [Platform].com — Marketing & Company Site           │
+│                                                                 │
+│  • Public landing page + pricing + creator type showcase        │
+│  • Creator signup & subscription purchase                       │
+│  • Tech support, bug reports, changelog, status page            │
+│  • Platform blog, tutorials, community resources                │
+│  URL: [platform].com/about, /pricing, /blog, /support           │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ Subscribes / Joins
+┌─────────────────────────────────────────────────────────────────┐
+│  PRODUCT 2: The Creator Social Network (Main Platform)          │
+│                                                                 │
+│  • Global discovery feed (public, no login required)            │
+│  • Creator social profiles  →  [platform].com/@username         │
+│  • Event calendar, Looking For board, Creator discovery map     │
+│  • Groups, chat, community spaces                               │
+│  • Collaborative revenue sharing                                │
+│  • ALL creator types: Photographers, Models, Actors,            │
+│    Cosplayers, MUAs, Videographers, Fashion Designers, etc.     │
+│                                                                 │
+│  FREE: Supporters get social profiles (no website, no tools)    │
+│  PAID: Creators get social profile + dedicated website (below)  │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ Included in paid Creator plans
+┌─────────────────────────────────────────────────────────────────┐
+│  PRODUCT 3: Creator Dedicated Websites (Hosted for ALL types)   │
+│                                                                 │
+│  Every paid Creator gets their own professional website         │
+│  POWERED BY THE SAME BACKEND as their social profile.           │
+│  Same galleries, same bookings, same store, same posts.         │
+│  The website is a professional-first view of the same data.     │
+│                                                                 │
+│  URL options (all plans):                                       │
+│    username.[platform].com          (subdomain, all plans)      │
+│    www.theircustomdomain.com        (custom domain, Pro+)       │
+│    [platform].com/meet/username     (event card, all plans)     │
+│                                                                 │
+│  Available to ALL creator types (not just photographers):       │
+│    📸 Photographer  → gallery, print shop, client delivery      │
+│    🎬 Videographer  → showreel, video delivery, booking         │
+│    👤 Model         → comp card, tearsheets, casting page       │
+│    🎭 Actor         → résumé, headshots, demo reel              │
+│    🦸 Cosplayer     → character portfolio, con schedule, shop   │
+│    💄 MUA           → service menu, before/after, booking       │
+│    👗 Fashion Dsgn  → lookbooks, collections, pattern shop      │
+│    📸 Studio        → team portfolio, studio rental, booking    │
+│    💇 Hair Stylist  → style portfolio, service menu, booking    │
+│    🎨 Stylist       → look portfolios, brand collabs            │
+│    🎬 Talent Agency → talent roster, booking requests           │
+│    + all other creator types                                    │
+└─────────────────────────────────────────────────────────────────┘
+
+KEY INSIGHT: The social profile and the dedicated website
+are TWO VIEWS OF THE SAME DATA. One backend serves both.
+
+Creator posts on social network → appears on their website feed
+Fan books on their website → appears in their CRM dashboard
+Fan buys a print from website → same Stripe flow as social platform
+Collaborative shoot revenue → splits to all contributors everywhere
+```
+
+### URL Structure
+```
+[platform].com                      → Main social network (discovery feed)
+[platform].com/explore              → Browse all creators
+[platform].com/events               → Public event calendar + map
+[platform].com/board                → Looking For casting board
+[platform].com/@username            → Creator social profile
+[platform].com/meet/username        → Event Presence Card (QR/NFC)
+
+username.[platform].com             → Creator's dedicated website
+username.[platform].com/            → Homepage (portfolio/hero)
+username.[platform].com/work        → Portfolio / gallery
+username.[platform].com/services    → Services + pricing
+username.[platform].com/store       → Print shop + digital products
+username.[platform].com/booking     → Appointment / session booking
+username.[platform].com/events      → Their upcoming events
+username.[platform].com/feed        → Their social posts embedded
+username.[platform].com/contact     → Contact form
+
+www.customdomain.com                → Custom domain (Pro+) → same website
 ```
 
 ### Monorepo App Structure
 ```
-MyShutterHost/ (Turborepo)
+[Platform]/ (Turborepo + pnpm)
 ├── apps/
-│   ├── marketing/     ← MyShutterHost.com (Product 1)
-│   ├── dashboard/     ← Photographer's backend admin panel
-│   ├── portfolio/     ← Photographer's public-facing website (Product 2)
+│   ├── marketing/     ← [Platform].com company/marketing site (Product 1)
+│   ├── social/        ← Main creator social network (Product 2)
+│   ├── dashboard/     ← Creator backend admin panel (all creator types)
+│   ├── website/       ← Creator dedicated websites — all types (Product 3)
 │   └── mobile/        ← React Native + Expo app (Phase 4)
 └── packages/
     ├── ui/            ← Shared design system & components
-    ├── db/            ← Prisma schema & database client
+    ├── db/            ← Prisma schema & database client (single DB)
     ├── types/         ← Shared TypeScript types
     └── config/        ← ESLint, Tailwind, TypeScript configs
+
+NOTE: apps/social and apps/website share the same packages/db —
+one database, two front doors, same data.
 ```
 
 ---
@@ -446,57 +505,152 @@ NEW INQUIRY → CONSULTATION → PROPOSAL SENT → BOOKED → SHOT → EDITING �
 
 ---
 
-### 🎨 Module 6 — Website Builder, Templates & Visual Editor
+### 🎨 Module 6 — Creator Website Builder (All Creator Types)
 
-**Pre-built Templates (photographer picks one, then customizes):**
-- [x] Minimal (white space, elegant, fine art)
-- [x] Bold (dark background, high contrast, dramatic)
-- [x] Editorial (magazine-style layouts, typography-driven)
-- [x] Wedding (soft tones, romantic, serif fonts)
-- [x] Portrait (face-forward, warm tones)
-- [x] Commercial (clean, corporate, product-feel)
-- [x] Adventure (full-bleed landscapes, rugged)
-- [x] Dark Room (ultra-dark, moody, cinematic)
+> **Expanded**: Previously photographer-only. Now every paid Creator account — regardless of type — gets a fully hosted professional website. Same WYSIWYG builder, same backend, creator-type-specific templates and sections.
 
-**WYSIWYG Visual Editor (Puck-based drag & drop):**
+---
+
+**🌐 Dual-Surface Architecture (Social Profile + Website)**
+
+```
+Every paid Creator gets TWO presences — powered by one backend:
+
+1. Social Profile   → [platform].com/@username
+   Social-first. Feed, followers, activity, discovery.
+   Fans find you here via the global network.
+
+2. Dedicated Website → username.[platform].com
+   Professional-first. Portfolio, booking, store, events.
+   Clients and industry contacts go here for business.
+
+Both surfaces show the same galleries, posts, bookings, and store.
+Changes in one reflect immediately in the other.
+Custom domain (Pro+) points to the dedicated website.
+```
+
+---
+
+**🗂️ Template Packs — Organized by Creator Type**
+
+*Photography Templates:*
+- [x] Minimal — white space, elegant, fine art
+- [x] Bold — dark background, high contrast, dramatic
+- [x] Editorial — magazine-style layouts, typography-driven
+- [x] Wedding — soft tones, romantic, serif fonts
+- [x] Portrait — face-forward, warm tones
+- [x] Commercial — clean, corporate, product-feel
+- [x] Adventure — full-bleed landscapes, rugged
+- [x] Dark Room — ultra-dark, moody, cinematic
+
+*Videography Templates:*
+- [x] Reel Focus — hero video autoplay, project tiles below
+- [x] Cinema — fullscreen video background, film-inspired
+- [x] Production House — clean and corporate for commercial work
+
+*Model Templates:*
+- [x] Comp Card First — stats and comp card front and center
+- [x] Editorial Model — full-bleed fashion imagery, minimal text
+- [x] Commercial Model — clean, bright, casting-ready
+
+*Actor Templates:*
+- [x] Résumé Forward — credits and training prominent, headshots alongside
+- [x] Headshot Hero — large headshot gallery, reel prominently featured
+- [x] Stage & Screen — theatrical feel, serif fonts, dramatic
+
+*Cosplay Templates:*
+- [x] Character Showcase — franchise-organized, colorful, fan-forward
+- [x] Convention Star — schedule front and center, merch store prominent
+- [x] Build Journal — blog/WIP style, process-focused
+
+*MUA / Hair / Stylist Templates:*
+- [x] Before & After — split-panel portfolio, service menu below
+- [x] Beauty Editorial — high-fashion inspired, bold imagery
+- [x] Clean & Booking — service menu + booking calendar as hero
+
+*Fashion Designer Templates:*
+- [x] Lookbook — collection galleries as hero, editorial imagery
+- [x] Runway — fashion show video + collection tiles
+- [x] Shop First — digital/pattern store as primary CTA
+
+*Photography Studio Templates:*
+- [x] Team + Portfolio — photographer roster + shared portfolio
+- [x] Space First — studio rental with calendar + equipment list
+
+---
+
+**🔧 Shared Sections (Available to ALL creator types)**
+
+Every creator type can add any of these sections to their website:
+- [x] Hero / Banner — full-width intro with photo, video, or animation
+- [x] About — bio, photo, background story
+- [x] Portfolio / Gallery — pulls from their uploaded galleries
+- [x] Social Feed — live embed of their posts from the social network
+- [x] Services & Pricing — service cards with descriptions and rates
+- [x] Store — print shop, digital downloads, commissions
+- [x] Booking Calendar — appointment scheduler with package options
+- [x] Events — upcoming appearances, workshops, mini sessions
+- [x] Testimonials — client reviews and quotes
+- [x] Press / Features — media mentions, brand collabs, publications
+- [x] Blog / Journal — posts and updates
+- [x] Contact Form — with lead capture and inquiry routing to CRM
+- [x] FAQ — expandable questions and answers
+- [x] Map — embedded location map (for studios, on-site businesses)
+- [x] Social Links — Instagram, TikTok, YouTube, etc.
+- [x] Custom HTML block — for advanced users
+
+**🔧 Creator-Type-Specific Sections**
+- [x] **Photographer**: Client Gallery Delivery button, Print Shop, Lightroom/PS plugin promo
+- [x] **Videographer**: Showreel embed, Project delivery links, Production credits
+- [x] **Model**: Digital Comp Card (stats + measurements), Tearsheet gallery, Rate Card
+- [x] **Actor**: Digital Résumé (credits, training, unions), Demo Reel, Headshot gallery, IMDB link
+- [x] **Cosplayer**: Character portfolio (by franchise), Convention Schedule, Commission Store, Build Journal
+- [x] **MUA / Hair / Stylist**: Before/After gallery, Service Menu, Kit/Product list, Certifications
+- [x] **Fashion Designer**: Collection Lookbooks (by season), Pattern/Digital Shop, Wholesale Inquiry form
+- [x] **Photography Studio**: Team roster, Studio Rental calendar, Equipment list
+- [x] **Talent Agency**: Talent roster with links to each creator's profile
+
+---
+
+**🖱️ WYSIWYG Visual Editor (Puck-based drag & drop)**
 - [x] Live preview — see changes in real time as you edit
-- [x] Drag & drop sections (hero, gallery, about, contact, testimonials, etc.)
-- [x] Resize, reorder, and delete sections visually
-- [x] Click any text to edit it inline (no pop-ups)
-- [x] Pick gallery layout per section from a visual picker
-- [x] Change colors, fonts, spacing per section with sliders/pickers
-- [x] Add/remove pages from the editor
-- [x] Menu builder (drag to reorder nav items, add dropdowns)
-- [x] Mobile preview mode (see how it looks on phone/tablet)
-- [x] Undo / redo history
+- [x] Drag & drop sections — add, reorder, resize, delete visually
+- [x] Click any text to edit inline (no pop-ups)
+- [x] Per-section settings — colors, fonts, spacing, layout
+- [x] Creator-type section library — filtered to show relevant sections first
+- [x] Add/remove pages (About, Gallery, Store, Booking, Blog, etc.)
+- [x] Navigation builder (drag to reorder, add dropdowns)
+- [x] Mobile / tablet preview mode
+- [x] Undo / redo history (50 steps)
 - [x] Save as draft or publish instantly
-- [x] Per-section animation picker (choose scroll effect for each section)
+- [x] Per-section animation picker
+- [x] AI section writer — "Write an About page for a wedding photographer in Austin"
 
-**Scroll Animation System (GSAP + ScrollTrigger + Lenis):**
-- [x] **Ken Burns on sections** — background photos slowly pan/zoom as you scroll past
-- [x] **Parallax layers** — foreground/background elements move at different speeds
-- [x] **Reveal on scroll** — text and photos fade/slide in as they enter the viewport
-- [x] **Sticky sections** — section pins while content animates over it
-- [x] **Horizontal scroll sections** — some sections scroll sideways for cinematic effect
-- [x] **Scale on scroll** — photos grow/shrink as you scroll past
-- [x] **Blur to sharp** — photos start blurry and come into focus as they appear
-- [x] **Counter animations** — numbers ("500+ weddings shot") count up on scroll
-- [x] **Scrubbing** — animation directly tied to scroll position for precise control
-- [x] **Smooth scrolling** — Lenis replaces browser default scroll for silky feel
-- [x] **Text split animations** — words/letters animate in one by one
-- [x] Photographer can choose animation intensity (subtle / medium / dramatic)
-- [x] Option to disable all animations for accessibility
+**✨ Scroll Animation System (GSAP + ScrollTrigger + Lenis)**
+- [x] Ken Burns on sections — background photos slowly pan/zoom as you scroll
+- [x] Parallax layers — foreground/background at different speeds
+- [x] Reveal on scroll — text and photos fade/slide in on viewport entry
+- [x] Sticky sections — section pins while content animates over it
+- [x] Horizontal scroll sections — cinematic sideways scroll
+- [x] Scale on scroll — photos grow/shrink as you scroll past
+- [x] Blur to sharp — photos come into focus as they appear
+- [x] Counter animations — numbers count up on scroll
+- [x] Text split animations — words/letters animate in one by one
+- [x] Smooth scrolling — Lenis for silky feel across all browsers
+- [x] Animation intensity picker (subtle / medium / dramatic)
+- [x] Disable all animations option (accessibility)
 
-**Other Site Builder Features:**
-- [x] Photographer profile page (bio, photo, gear list, specialties, contact info)
-- [x] Portfolio pages (curated best-work showcases)
-- [x] Blog / journal section
-- [x] Contact form with lead capture
-- [x] Custom subdomain (`name.myshutterhost.com`)
-- [x] Custom domain (BYOD — bring your own domain)
-- [x] SEO tools (custom meta titles, descriptions, image alt text, sitemap)
-- [x] Mobile-responsive all templates
-- [x] Dark/light mode toggle per site
+**⚙️ Website Settings & Publishing**
+- [x] Custom subdomain — `username.[platform].com` (all paid plans)
+- [x] Custom domain — bring your own domain (Pro+ plans)
+- [x] SEO tools — meta titles, descriptions, image alt text, XML sitemap
+- [x] Open Graph tags — controls how links look when shared on social media
+- [x] Google Analytics / Meta Pixel integration
+- [x] Dark / light mode toggle per site
+- [x] Password-protect entire website (for private portfolios)
+- [x] Coming soon / maintenance mode page
+- [x] Website analytics — page views, visitor locations, top pages (Module 9)
+- [x] Social feed integration — posts from [platform] social profile appear on website automatically
 
 ---
 
