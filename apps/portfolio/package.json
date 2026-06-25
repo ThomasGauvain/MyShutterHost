@@ -1,0 +1,28 @@
+{
+  "name": "@myshutterhost/portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3002",
+    "build": "next build",
+    "start": "next start -p 3002",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "gsap": "^3.12.0",
+    "@studio-freight/lenis": "^1.0.0",
+    "@myshutterhost/ui": "workspace:*",
+    "@myshutterhost/db": "workspace:*",
+    "@myshutterhost/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@myshutterhost/config": "workspace:*",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5.4.0"
+  }
+}

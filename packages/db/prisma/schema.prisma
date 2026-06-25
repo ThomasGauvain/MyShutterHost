@@ -1,0 +1,349 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// USERS & AUTH
+// ─────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  role          UserRole  @default(CLIENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Auth.js relations
+  accounts      Account[]
+  sessions      Session[]
+
+  // Profile
+  photographerProfile  PhotographerProfile?
+  clientProfile        ClientProfile?
+
+  // Support tickets
+  supportTickets SupportTicket[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  PHOTOGRAPHER
+  CLIENT
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ─────────────────────────────────────────────
+// PHOTOGRAPHER
+// ─────────────────────────────────────────────
+
+model PhotographerProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  username      String   @unique
+  displayName   String
+  bio           String?  @db.Text
+  specialties   String[]
+  location      String?
+  website       String?
+  phone         String?
+  
+  // Subscription
+  plan          PlanTier @default(FREE)
+  stripeCustomerId String?
+  
+  // Branding
+  customDomain  String?  @unique
+  logoUrl       String?
+  brandColors   Json?
+
+  // Settings
+  aiProvider    AIProvider?
+  aiApiKey      String?     // encrypted
+  faceSearchEnabled Boolean @default(false)
+  faceSearchProvider FaceSearchProvider?
+  faceSearchApiKey   String? // encrypted
+
+  // Workflow Mode (Lightroom/Photoshop)
+  editingWorkflow EditingWorkflow @default(LIGHTROOM_ONLY)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  galleries     Gallery[]
+  events        Event[]
+
+  @@map("photographer_profiles")
+}
+
+enum PlanTier {
+  FREE
+  PRO
+  STUDIO
+  ENTERPRISE
+}
+
+enum AIProvider {
+  OPENAI
+  ANTHROPIC
+  GOOGLE
+}
+
+enum FaceSearchProvider {
+  AWS_REKOGNITION
+  AZURE_FACE
+}
+
+enum EditingWorkflow {
+  LIGHTROOM_ONLY
+  PHOTOSHOP_ONLY
+  LR_PS_HYBRID
+}
+
+// ─────────────────────────────────────────────
+// CLIENT
+// ─────────────────────────────────────────────
+
+model ClientProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  bio       String?
+  location  String?
+  isPublic  Boolean  @default(true)
+
+  // Stars wallet
+  starsBalance Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("client_profiles")
+}
+
+// ─────────────────────────────────────────────
+// GALLERIES
+// ─────────────────────────────────────────────
+
+model Gallery {
+  id               String          @id @default(cuid())
+  photographerId   String
+  title            String
+  description      String?         @db.Text
+  slug             String
+  coverImageUrl    String?
+  layout           GalleryLayout   @default(GRID_MASONRY)
+  visibility       GalleryVisibility @default(PUBLIC)
+  password         String?         // hashed, for password-protected galleries
+
+  // Download tiers
+  freeDownloadEnabled    Boolean @default(true)
+  paidDownloadEnabled    Boolean @default(false)
+  paidDownloadPrice      Float?
+  highResDownloadEnabled Boolean @default(false)
+  highResDownloadPrice   Float?
+
+  // Watermark
+  watermarkEnabled Boolean @default(false)
+  watermarkUrl     String?
+
+  // Music
+  musicUrl         String?
+  musicEnabled     Boolean @default(false)
+
+  // Settings
+  faceSearchEnabled Boolean @default(false)
+  publishedAt       DateTime?
+  isActive          Boolean  @default(false) // for the "meet" page event card
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  photographer      PhotographerProfile @relation(fields: [photographerId], references: [id], onDelete: Cascade)
+  photos            Photo[]
+
+  @@unique([photographerId, slug])
+  @@map("galleries")
+}
+
+enum GalleryLayout {
+  GRID_MASONRY
+  GRID_UNIFORM
+  GRID_JUSTIFIED
+  FILMSTRIP_HORIZONTAL
+  MAGAZINE
+  FULL_WIDTH_SCROLL
+  EDITORIAL
+  SLIDESHOW
+  POLAROID
+  MOSAIC
+}
+
+enum GalleryVisibility {
+  PUBLIC
+  PRIVATE
+  PASSWORD_PROTECTED
+  CLIENT_ONLY
+}
+
+// ─────────────────────────────────────────────
+// PHOTOS
+// ─────────────────────────────────────────────
+
+model Photo {
+  id          String   @id @default(cuid())
+  galleryId   String
+  url         String   // Cloudflare R2 URL
+  thumbUrl    String?
+  filename    String
+  altText     String?
+  caption     String?
+  width       Int?
+  height      Int?
+  fileSize    Int?
+  mimeType    String?
+  
+  // EXIF data
+  exifData    Json?
+  takenAt     DateTime?
+  
+  // Location
+  latitude    Float?
+  longitude   Float?
+  locationName String?
+  
+  // AI
+  aiTags      String[]
+  
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  gallery     Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+  @@map("photos")
+}
+
+// ─────────────────────────────────────────────
+// EVENTS & MINI SESSIONS
+// ─────────────────────────────────────────────
+
+model Event {
+  id             String      @id @default(cuid())
+  photographerId String
+  title          String
+  description    String?     @db.Text
+  eventType      EventType
+  coverImageUrl  String?
+  location       String?
+  startDate      DateTime
+  endDate        DateTime?
+  isFree         Boolean     @default(false)
+  price          Float?
+  totalSlots     Int?
+  bookedSlots    Int         @default(0)
+  isPublished    Boolean     @default(false)
+  facebookEventUrl String?
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  photographer   PhotographerProfile @relation(fields: [photographerId], references: [id], onDelete: Cascade)
+
+  @@map("events")
+}
+
+enum EventType {
+  MINI_SESSION
+  STYLED_SHOOT
+  WORKSHOP
+  CONVENTION
+  PUBLIC_EVENT
+}
+
+// ─────────────────────────────────────────────
+// SUPPORT TICKETS
+// ─────────────────────────────────────────────
+
+model SupportTicket {
+  id          String        @id @default(cuid())
+  userId      String
+  type        TicketType
+  title       String
+  description String        @db.Text
+  severity    TicketSeverity @default(MEDIUM)
+  status      TicketStatus  @default(SUBMITTED)
+  screenshotUrl String?
+  adminNotes  String?       @db.Text
+  emailUpdates Boolean      @default(false)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("support_tickets")
+}
+
+enum TicketType {
+  BUG
+  FEATURE_REQUEST
+  GENERAL_HELP
+}
+
+enum TicketSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TicketStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}

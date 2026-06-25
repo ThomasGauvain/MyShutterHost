@@ -1,0 +1,1146 @@
+# MyShutterHost — Full Implementation Plan v2
+
+A professional SaaS photography hosting platform — think Zenfolio + SmugMug + Pixieset, but more powerful and fully your own.
+
+---
+
+## 🏗️ Two Distinct Products — Important Architecture Note
+
+> [!IMPORTANT]
+> MyShutterHost is TWO separate products sharing one codebase (monorepo).
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  PRODUCT 1: MyShutterHost.com                             │
+│  (The platform's own public-facing website)               │
+│                                                           │
+│  • Marketing landing page + pricing                       │
+│  • Photographer signup & subscription purchase            │
+│  • Tech support & bug reporting                          │
+│  • Changelog & update notes                              │
+│  • Public roadmap & feature suggestions                  │
+│  • Planned maintenance / downtime notices                │
+│  • Platform status page (is the service up?)             │
+│  • Platform blog / photography tips                      │
+└────────────────────────────────────────────────────────────┘
+                          ↓ Subscribes
+┌────────────────────────────────────────────────────────────┐
+│  PRODUCT 2: Photographer's Hosted Website                 │
+│  (What subscribers get — their own site on the platform)  │
+│                                                           │
+│  • photographer.myshutterhost.com  (free tier)           │
+│  • www.theirownbrand.com           (paid tier)           │
+│                                                           │
+│  • Their portfolio galleries + store                     │
+│  • Their booking calendar + contracts                    │
+│  • Their client galleries + proofing                     │
+│  • Their WYSIWYG-customized website                      │
+│  • Everything in Modules 1–14 of this plan               │
+└────────────────────────────────────────────────────────────┘
+```
+
+### Monorepo App Structure
+```
+MyShutterHost/ (Turborepo)
+├── apps/
+│   ├── marketing/     ← MyShutterHost.com (Product 1)
+│   ├── dashboard/     ← Photographer's backend admin panel
+│   ├── portfolio/     ← Photographer's public-facing website (Product 2)
+│   └── mobile/        ← React Native + Expo app (Phase 4)
+└── packages/
+    ├── ui/            ← Shared design system & components
+    ├── db/            ← Prisma schema & database client
+    ├── types/         ← Shared TypeScript types
+    └── config/        ← ESLint, Tailwind, TypeScript configs
+```
+
+---
+
+## Technology Stack (Confirmed)
+
+| Layer | Choice |
+|-------|--------|
+| **Framework** | Next.js 16 (App Router, TypeScript) |
+| **Styling** | Tailwind CSS + shadcn/ui |
+| **Monorepo** | Turborepo + pnpm (4 apps: marketing, dashboard, portfolio, mobile) |
+| **Database** | PostgreSQL — self-hosted Docker container on Coolify (same Vultr server, migrate to dedicated later) |
+| **ORM** | Prisma |
+| **Auth** | Auth.js v5 |
+| **Photo/Video Storage** | Cloudflare R2 (zero egress fees) |
+| **CDN / DNS / DDoS** | Cloudflare |
+| **VPS** | Vultr |
+| **PaaS / Deploy** | Coolify (Docker, self-hosted) |
+| **CI/CD** | GitHub → Coolify webhook |
+| **Reverse Proxy** | Traefik (bundled in Coolify) |
+| **Payments** | Stripe (subscriptions + store + tips + pay-to-download) |
+| **Email** | Resend |
+| **AI Chatbox** | Vercel AI SDK v6 (npm package, runs on Vultr — no Vercel hosting required) |
+| **Image Processing** | Sharp (server-side) + Cloudflare Images |
+| **Video Processing** | FFmpeg + Cloudflare Stream |
+| **Music/Audio** | Howler.js (client-side audio player) |
+| **Scroll Animations** | **GSAP + ScrollTrigger** (Ken Burns, parallax, scrubbing, reveal) |
+| **Smooth Scrolling** | **Lenis** (buttery smooth scroll experience) |
+| **Slideshows** | **Swiper.js** (all transition types, touch support) |
+| **Gallery Lightbox** | **PhotoSwipe** (fullscreen viewer, touch/swipe/zoom) |
+| **Page Transitions** | **Framer Motion** (React component + route transitions) |
+| **WYSIWYG Editor** | **Puck** (open-source React drag-and-drop page builder) |
+| **Rich Text Editing** | **TipTap** (rich text blocks within WYSIWYG) |
+| **Search** | PostgreSQL Full-Text Search → Algolia (at scale) |
+| **Cache** | Redis — self-hosted Docker container on Coolify (same Vultr server) |
+| **Plugin SDK** | Custom REST + OAuth2 (for Lightroom/Photoshop plugins) |
+| **Real-time Chat** | **Socket.io** (self-hosted on Vultr via Coolify — WebSocket DMs + group rooms) |
+
+---
+
+## Platform Modules & Full Feature List
+
+### 📸 Module 1 — Photo & Video Galleries
+
+**Gallery Layout Options (photographer picks per gallery):**
+- [x] **Masonry** — Pinterest-style, variable heights, natural stacking
+- [x] **Justified Grid** — all same height, variable widths (Google Photos style)
+- [x] **Square Grid** — equal size squares, clean and minimal
+- [x] **Mosaic** — mixed large/small tiles, editorial magazine feel
+- [x] **Honeycomb** — hexagonal cells, very artistic
+- [x] **Filmstrip** — horizontal scrolling strip
+- [x] **Spotlight** — one hero image + surrounding thumbnails
+- [x] **Magazine** — feature image + text columns + supporting photos
+- [x] **Fullscreen** — one photo at a time, full viewport
+- [x] **Panoramic** — wide horizontal scroll for landscape shots
+
+**Slideshow Effects:**
+- [x] **Ken Burns** — slow cinematic pan + zoom on still photos
+- [x] **Fade** — classic crossfade between photos
+- [x] **Slide** — photos push in from left/right
+- [x] **Zoom Burst** — photo zooms into the next one
+- [x] **3D Flip** — card flip transition
+- [x] **Morph / Dissolve** — photos blend into each other
+- [x] **Parallax Slide** — background + foreground move at different speeds
+- [x] Music playback synced to slideshow (Howler.js)
+- [x] Autoplay speed control
+- [x] Captions overlay per photo
+
+**Other Gallery Features:**
+- [x] Video gallery (upload, stream via Cloudflare Stream)
+- [x] Drag-and-drop bulk upload
+- [x] Individual photo/video detail pages
+- [x] Watermarking (auto-applied on download/share)
+- [x] EXIF data display (camera, lens, settings)
+- [x] Add music/audio to photo albums (background slideshow music)
+- [x] Photo culling tool (swipe-to-keep / swipe-to-reject for editing selection)
+- [x] RAW file upload + storage support
+- [x] Batch tagging and organizing
+- [x] Face detection / smart tagging (AI-assisted)
+- [x] Slideshow creator with transitions + music
+- [x] QR code generator for sharing galleries
+- [x] Geographic tagging (map view of where photos were taken)
+
+---
+
+### 💰 Module 2 — Point of Sale & Monetization
+
+**Digital Products:**
+- [x] Sell digital downloads (pay-to-download individual photos or full galleries)
+- [x] Sell presets, overlays, and other digital files
+- [x] Accept tips from visitors
+- [x] **Hearts & Stars micropayment system** (like Facebook Stars — visitors buy icons/credits to send to photographers as support)
+- [x] Pay-to-unlock galleries (client pays before viewing)
+
+**Physical Products:**
+- [x] Sell prints (standard sizes: 4x6, 8x10, 11x14, canvas, metal, fine art paper, etc.)
+- [x] Sell other products (USB drives, photo books, albums, greeting cards, framed prints)
+- [x] Print lab integrations (Printful, WHCC, Bay Photo, Miller's Lab) — lab fulfills & ships directly
+
+**Shipping System:**
+- [x] **USPS integration** — First Class, Priority Mail, Priority Mail Express, Media Mail
+- [x] **UPS integration** — Ground, 2-Day Air, Next Day Air, Worldwide
+- [x] **FedEx integration** — Ground, Express, International Priority
+- [x] **DHL integration** — international shipping
+- [x] **Real-time rate shopping** — compare rates across all carriers at checkout, show cheapest or fastest options to customer
+- [x] **Shipping label generation** — purchase and print labels directly from the dashboard (no going to carrier websites)
+- [x] **Shipment tracking** — auto-send tracking number to customer by email; live tracking status in their order page
+- [x] **Package presets** — save common box sizes/weights so rates calculate automatically (e.g. "8x10 print mailer = 6oz, 10x13 envelope")
+- [x] **Shipping rules** — set free shipping thresholds (e.g. free shipping on orders over $75), flat rate options, or local pickup
+- [x] **International shipping** — customs forms auto-filled, harmonized tariff codes for prints/photo products
+- [x] **Address validation** — verify customer shipping address before order is placed (avoid failed deliveries)
+- [x] **Return labels** — generate prepaid return labels when needed
+- [x] **Shipping zones** — set different rates or restrict shipping by country/region
+- [x] **Multi-carrier fallback** — if one carrier API is down, automatically fall back to next carrier
+- [x] **Batch label printing** — print multiple shipping labels at once for bulk orders
+- [x] Order management dashboard (pending, in production, shipped, delivered status per order)
+
+**Pricing & Promotions:**
+- [x] Discount codes & coupons
+- [x] Gift cards
+- [x] Rush delivery / expedited shipping upsell at checkout
+- [x] Tax calculation + reporting (US sales tax, VAT for international)
+- [x] Stripe Connect (photographers receive payouts directly)
+- [x] Revenue dashboard (sales, tips, stars earned, payouts, shipping costs)
+
+---
+
+### 🔗 Module 3 — Social & Sharing
+
+**Standard Sharing:**
+- [x] Like & favorite individual photos and galleries
+- [x] Share to social media platforms (Facebook, Instagram, Pinterest, X/Twitter, TikTok)
+- [x] Send gallery/photo links to friends via social media
+- [x] Embedded social media feeds on photographer's site (Instagram feed, TikTok feed, etc.)
+- [x] Public gallery comments
+- [x] Shareable gallery link (optionally password-protected)
+- [x] QR code for any gallery or photo
+- [x] Embeddable gallery widget (embed your gallery on external websites)
+
+**📲 Tap & Scan Event Presence Card**
+
+A digital smart business card the photographer shows at events — guests scan or tap to instantly connect, find photos, and tip:
+
+- [x] **Photographer "Meet" page** — a beautiful mobile-optimized landing page. URL depends on subscription tier:
+
+  | Tier | Meet Page URL |
+  |------|--------------|
+  | **Free** | `username.myshutterhost.com/meet` |
+  | **Pro / Studio** | `www.theircustomdomain.com/meet` |
+  | **Platform fallback** (always works) | `myshutterhost.com/meet/username` → redirects to their primary URL |
+
+  - QR code and NFC always use the photographer's **primary URL** (custom domain if they have one, subdomain if not)
+  - The `myshutterhost.com/meet/username` fallback always redirects to the right place — useful for printed materials that outlive a domain change
+  - Profile photo, name, specialty, location tagline
+
+  - "Visit my website" button
+  - "See today's event photos" — links to the photographer's **Active Event Gallery** (photographer sets which gallery is "active" before the event)
+  - Social media links (Instagram, Facebook, TikTok, Pinterest, X — photographer picks which to show)
+  - ⭐ **Tip / Send Stars button** — guest can tip instantly with no account required (Stripe guest checkout)
+  - "Save my contact" — downloads a `.vcf` vCard with name, phone, email, website, social links
+  - "Follow me on MyShutterHost" button
+- [x] **Dynamic QR code** — always points to their meet page; regenerates automatically if username changes
+- [x] **Full-screen QR display in mobile app** — photographer opens the app → taps "Event Card" → phone displays a bright full-screen QR code guests can scan instantly (high contrast, no fumbling with links)
+- [x] **NFC tap-to-share** — photographer taps their phone to a guest's phone → guest's phone opens the meet page instantly (Android + iPhone 13+ with background NFC tag reading)
+- [x] **Printable QR card** — download a print-ready PNG/PDF of the QR code for:
+  - Table tent cards at events
+  - Badge lanyards at conventions
+  - Foam board signs at outdoor shoots
+  - Studio wall display
+- [x] **Active Event toggle** — in the dashboard or app, photographer taps one button to set which gallery is "active" — it appears on the meet page as the featured event link
+- [x] **QR on photographer's website profile page** — their public website profile section shows their QR code so returning visitors can save it or scan it again
+- [x] **Tip tracking** — all tips received via the meet page appear in the revenue dashboard, tagged as "Event Tip"
+- [x] **Meet page analytics** — see how many people scanned the code, tipped, clicked social links, or saved the contact at each event
+
+
+
+---
+
+### 📅 Module 4 — Booking, Contracts & Client Management
+- [x] Booking calendar (photographers set availability, clients book sessions)
+- [x] Wedding planner (multi-event timeline, shot list builder, vendor contacts)
+- [x] Digital contracts (photographer creates, client signs online — e-signature)
+- [x] Invoicing & payment requests
+- [x] Client CRM (track leads, sessions, communication history)
+- [x] Online questionnaires / intake forms for clients before shoots
+- [x] Mood board builder (share style inspiration with clients before sessions)
+- [x] Session packages (bundle hours + deliverables + pricing)
+- [x] Automated reminder emails (booking confirmation, session reminders, gallery ready)
+
+---
+
+### 🖼️ Module 5 — Client Galleries, Proofing & Social Tagging
+
+**Download Tier System (photographer sets per gallery):**
+- [x] **Free tier** — low-res download (800px, 72 DPI), always watermarked, always available to everyone
+- [x] **Standard paid tier** — medium-res (2000px), no watermark, photographer sets price
+- [x] **High-res paid tier** — full print-ready resolution, no watermark, photographer sets price
+- [x] **Free high-res override** — photographer can unlock full-res for free on any gallery (e.g. for clients who already paid for a session)
+- [x] Per-photo overrides — set different download tiers on individual photos within a gallery
+- [x] Download limits — cap how many photos a client can download (e.g. 20 free downloads included)
+- [x] Guest checkout — visitors buy/download without creating an account
+- [x] Watermark auto-applied to free downloads, stripped on paid
+
+**Social People Tagging (Viral Event Gallery System):**
+- [x] **Tag people in photos** — click a face in a photo, type a name or email to tag them
+- [x] **AI face detection** — automatically detects faces in photos and draws tag boxes, photographer approves suggested tags
+- [x] **"Find My Photos" selfie search** — visitor uploads a selfie → AI searches the entire gallery and highlights every photo they appear in (huge for large events — weddings, concerts, sports, school events)
+- [x] **Event QR code** — photographer displays a QR code sign at the event → guests scan it → instantly taken to the gallery to find their photos
+- [x] **Tag notification emails** — "You were tagged in 12 photos at [Event Name]! Click to view & download" → drives people back to the gallery
+- [x] **"My Photos" filtered view** — once tagged/found, the gallery highlights only that person's photos so they don't have to scroll through hundreds of images
+- [x] **Privacy & untag** — anyone can request to be untagged from a photo (GDPR/privacy compliance)
+- [x] **Tag friends** — visitors can tag their friends in photos, triggering a notification to that friend
+- [x] **Bulk share my tagged photos** — share all photos you appear in to Facebook, Instagram, etc. in one click
+
+**Viral Monetization Loop (per event gallery):**
+- [x] Visitors who find their photos can:
+  - Download free (low-res, watermarked) and share to social media
+  - Pay to download high-res
+  - Buy a print of any photo they're in
+  - Leave a tip to the photographer
+  - Send hearts / stars to support the photographer
+- [x] Every social share includes a link back to the gallery (organic traffic engine)
+- [x] Shareable Open Graph preview — when gallery link is posted to Facebook/X, it shows a beautiful preview image + gallery title
+
+**Client Proofing:**
+- [x] Password-protected private client galleries
+- [x] Client proofing (clients mark favorites / request edits)
+- [x] Pay-to-unlock gallery (client pays before viewing full gallery)
+- [x] Print proofing (client approves prints before order is placed)
+- [x] Gallery expiry dates
+- [x] Client notification when gallery is ready
+
+**Tech Required for Tagging & Face Search:**
+- [x] **AWS Rekognition** or **Azure Face API** — face detection, face matching for selfie search
+- [x] Face index per gallery — store face embeddings so selfie search is fast even with 1000+ photos
+- [x] Tag data stored in PostgreSQL — linked to photo ID + person (name, email, or registered user)
+
+
+---
+
+### 🎨 Module 6 — Website Builder, Templates & Visual Editor
+
+**Pre-built Templates (photographer picks one, then customizes):**
+- [x] Minimal (white space, elegant, fine art)
+- [x] Bold (dark background, high contrast, dramatic)
+- [x] Editorial (magazine-style layouts, typography-driven)
+- [x] Wedding (soft tones, romantic, serif fonts)
+- [x] Portrait (face-forward, warm tones)
+- [x] Commercial (clean, corporate, product-feel)
+- [x] Adventure (full-bleed landscapes, rugged)
+- [x] Dark Room (ultra-dark, moody, cinematic)
+
+**WYSIWYG Visual Editor (Puck-based drag & drop):**
+- [x] Live preview — see changes in real time as you edit
+- [x] Drag & drop sections (hero, gallery, about, contact, testimonials, etc.)
+- [x] Resize, reorder, and delete sections visually
+- [x] Click any text to edit it inline (no pop-ups)
+- [x] Pick gallery layout per section from a visual picker
+- [x] Change colors, fonts, spacing per section with sliders/pickers
+- [x] Add/remove pages from the editor
+- [x] Menu builder (drag to reorder nav items, add dropdowns)
+- [x] Mobile preview mode (see how it looks on phone/tablet)
+- [x] Undo / redo history
+- [x] Save as draft or publish instantly
+- [x] Per-section animation picker (choose scroll effect for each section)
+
+**Scroll Animation System (GSAP + ScrollTrigger + Lenis):**
+- [x] **Ken Burns on sections** — background photos slowly pan/zoom as you scroll past
+- [x] **Parallax layers** — foreground/background elements move at different speeds
+- [x] **Reveal on scroll** — text and photos fade/slide in as they enter the viewport
+- [x] **Sticky sections** — section pins while content animates over it
+- [x] **Horizontal scroll sections** — some sections scroll sideways for cinematic effect
+- [x] **Scale on scroll** — photos grow/shrink as you scroll past
+- [x] **Blur to sharp** — photos start blurry and come into focus as they appear
+- [x] **Counter animations** — numbers ("500+ weddings shot") count up on scroll
+- [x] **Scrubbing** — animation directly tied to scroll position for precise control
+- [x] **Smooth scrolling** — Lenis replaces browser default scroll for silky feel
+- [x] **Text split animations** — words/letters animate in one by one
+- [x] Photographer can choose animation intensity (subtle / medium / dramatic)
+- [x] Option to disable all animations for accessibility
+
+**Other Site Builder Features:**
+- [x] Photographer profile page (bio, photo, gear list, specialties, contact info)
+- [x] Portfolio pages (curated best-work showcases)
+- [x] Blog / journal section
+- [x] Contact form with lead capture
+- [x] Custom subdomain (`name.myshutterhost.com`)
+- [x] Custom domain (BYOD — bring your own domain)
+- [x] SEO tools (custom meta titles, descriptions, image alt text, sitemap)
+- [x] Mobile-responsive all templates
+- [x] Dark/light mode toggle per site
+
+---
+
+### 🔌 Module 7 — Lightroom & Photoshop Integration
+
+> **Plugin Tech**: Lightroom Classic plugin (Lua + LR SDK). Photoshop plugin (UXP — JavaScript/React, Adobe's modern plugin system). Both use the same MyShutterHost OAuth2 account. Same trained style profile shared between both apps.
+
+---
+
+**Three Workflow Modes — Photographer Chooses in Dashboard:**
+
+| Mode | Best For | Flow |
+|------|----------|------|
+| **🟡 Lightroom Only** | Event/wedding volume work | Import → AI Cull → AI Style in LR → Export |
+| **🔵 Photoshop Only** | Beauty, boudoir, high fashion | Open in PS → AI Retouch → Export |
+| **🟢 LR → PS Hybrid** | Professional mixed workflow | LR batch edits all → select hero shots → PS deep retouch → back to LR |
+
+---
+
+**🟡 Lightroom Plugin — Full Feature Set**
+
+*Phase 1 — Gallery Integration:*
+- [x] Upload photos directly from Lightroom to MyShutterHost galleries
+- [x] Create new gallery from Lightroom collection with one click
+- [x] OAuth2 login — no passwords stored in the plugin
+- [x] Import/export Lightroom presets (.lrtemplate / .xmp format)
+- [x] Preset marketplace — browse, download, and publish presets from inside Lightroom
+
+*Phase 3 — AI Style Trainer (Lightroom):*
+- [x] **"Train from existing catalog"** — select any folders of already-edited photos; plugin reads every develop setting from edited photos and sends patterns to MyShutterHost (no full-res upload — thumbnails + metadata only)
+- [x] Folder selector UI — photographer checks which folders to include/exclude (exclude old style, different genres, etc.)
+- [x] Estimated accuracy preview before training starts
+- [x] Per-shoot-type style learning — AI builds separate style profiles for weddings, portraits, cosplay, golden hour, studio, etc. and applies the right one automatically
+- [x] **AI Auto-Cull** — AI sets pick/reject/unflag on every photo in a folder based on: sharpness, exposure quality, blink detection, duplicate grouping, expression scoring
+- [x] **AI Apply My Style** — AI sends thumbnails + EXIF to API, receives predicted develop settings, applies them to all selected photos in Lightroom non-destructively
+- [x] **AI Color Balance** — corrects white balance (Temp + Tint) per photo based on lighting conditions learned from photographer's style
+- [x] **AI Skin Tone Recovery** — adjusts HSL Orange/Red channels to match the photographer's typical skin rendering
+- [x] **AI Noise Reduction** — applies Luminance + Color noise reduction at the level the photographer uses per ISO range
+- [x] **AI Eye Brightening** — face detection locates iris → local adjustment brush applied at photographer's typical settings (+exposure, +clarity)
+- [x] **AI Under-Eye Correction** — face detection locates under-eye region → healing/adjustment brush applied at photographer's typical settings
+- [x] **AI Spot Removal** — vision AI detects skin blemishes → Lightroom healing spots placed automatically
+- [x] Continuous learning — corrections made after AI edits feed back as new training data automatically
+- [x] **"Send to Photoshop"** button — sends selected hero shots to Photoshop plugin for deep retouching
+- [x] Style accuracy dashboard — shows current model accuracy %, training photo count, last trained date
+
+---
+
+**🔵 Photoshop Plugin — Full Feature Set**
+
+*Phase 1 — Gallery Integration:*
+- [x] Export images from Photoshop directly to MyShutterHost galleries
+- [x] Import/export Photoshop actions & presets
+- [x] Skin smoothing, retouching presets library
+- [x] OAuth2 login — same account as Lightroom plugin
+
+*Phase 3 — AI Style Trainer (Photoshop):*
+- [x] **Learn from existing PS work** — plugin reads the photographer's Action history, layer stack structure, brush settings relative to detected face landmarks
+- [x] **AI Frequency Separation** — auto-creates the photographer's preferred frequency separation layer stack; heals blemishes on texture layer, smooths color/tone on base layer
+- [x] **AI Dodge & Burn** — creates dodge/burn layer; applies learned brightness sculpting relative to face structure (cheekbones, jawline, brow)
+- [x] **AI Eye Brightening (precise)** — face detection + iris segmentation → applies dodge to iris and whites at learned opacity/radius
+- [x] **AI Under-Eye Healing** — face detection → healing brush on texture layer at photographer's typical settings
+- [x] **AI Flyaway Hair Removal** — detects stray hairs at head boundary → content-aware fill removes them
+- [x] **AI Blemish & Spot Removal** — vision AI detects blemishes → healing brush + clone stamp on correct layer
+- [x] **AI Background Cleanup** — detects distracting elements → content-aware fill (photographer approves before applying)
+- [x] **Neural Filters (Adobe AI)** — applies Adobe's Skin Smoothing and Smart Portrait Neural Filters at the strength the photographer prefers
+- [x] **AI LUT Color Grading** — applies photographer's preferred LUT at their typical opacity as a layer
+- [x] **AI Liquify (subtle)** — Face Tool micro-adjustments at the level the photographer typically uses (conservative by default, adjustable)
+- [x] **High-Pass Sharpening** — creates high-pass sharpening layer at photographer's typical radius and opacity
+- [x] **"Send back to Lightroom"** — saves and syncs the retouched file back to the Lightroom catalog automatically
+- [x] All AI edits on separate named layers — photographer can turn any step on/off
+
+---
+
+**🟢 LR → PS Hybrid Workflow**
+- [x] Photographer clicks "Send to Photoshop" on selected hero shots from inside the Lightroom plugin
+- [x] Lightroom develop settings are preserved as a smart object in Photoshop
+- [x] Photoshop AI runs the deep retouching routine automatically on arrival
+- [x] "Return to Lightroom" button saves and syncs the retouched file back to the catalog
+- [x] Lightroom shows a "PS Retouched" badge on photos that have been through Photoshop
+
+---
+
+**🏪 Plugin & Preset Marketplace**
+- [x] Photographers can publish their own Lightroom presets for free or paid download
+- [x] Photographers can publish their own Photoshop actions for free or paid download
+- [x] Photographers can publish their own custom plugins (built on LR SDK or PS UXP) — free or paid
+- [x] Open-source option — mark plugin/preset as open-source with GitHub link
+- [x] Optional Adobe Exchange distribution alongside marketplace listing
+- [x] Plugin submissions reviewed before listing (malware prevention)
+- [x] Platform takes 20% cut of paid plugin/preset sales
+- [x] Star ratings and reviews on all marketplace items
+
+---
+
+
+### 🤖 Module 8 — AI Features
+
+> **Provider**: User-selectable in dashboard (OpenAI GPT-4o / Anthropic Claude / Google Gemini). Photographer brings their own API key. Vision-capable models enable photo analysis features.
+
+---
+
+**🧭 Level 1 — Platform Assistant (Q&A Chatbox)**
+
+The AI knows every feature of MyShutterHost and guides photographers contextually based on which page they're on:
+- [x] Platform help & navigation — *"How do I set up a private client gallery?"*
+- [x] Context-aware suggestions — AI sees which page you're on and offers relevant help proactively
+- [x] Conversation history — saved chat sessions so photographers can reference past advice
+- [x] Prompt library — pre-built quick-start prompts (*"Write my bio"*, *"Caption this photo"*, *"Draft a client email"*)
+- [x] Photography education — camera settings, composition, lighting, editing techniques
+- [x] Lightroom & Photoshop guidance — workflow tips, adjustment advice, preset suggestions
+- [x] Legal & contract help — explain model releases, copyright basics, flag risky contract language
+- [x] Pricing & business advice — package structuring, how to handle difficult clients, market positioning
+- [x] SEO coaching — review page titles, suggest keywords, explain best practices
+
+---
+
+**⚡ Level 2 — Agentic Actions (AI Does Things FOR You)**
+
+The AI can execute real tasks inside the platform — photographer reviews and approves before anything publishes:
+- [x] *"Create a new gallery called 'Sarah & Mike Wedding 2026'"* → creates gallery, sets to private, opens upload
+- [x] *"Block my calendar next weekend"* → marks dates unavailable in booking calendar
+- [x] *"Generate a client questionnaire for a newborn session"* → builds questionnaire, saves to their forms library
+- [x] *"Draft a 'gallery is ready' email to my client Sarah"* → writes email, shows preview, photographer approves & sends
+- [x] *"Create a TFP post for a Halloween cosplay shoot in Dallas, looking for a MUA"* → fills collaboration post form for review
+- [x] *"Apply a 15% discount code called SPRING2026"* → creates the coupon in store settings
+- [x] *"Write alt text for all photos in my Summer Gallery"* → analyzes each photo, populates alt text fields in bulk
+- [x] *"Generate a shot list for a 6-hour wedding"* → creates comprehensive shot list, saves to event planner
+- [x] *"Write my Instagram bio"* → generates bio based on their portfolio style and specialties
+- [x] *"Set up a mini session — 30 mins, $150, 3 slots, Saturday April 5th"* → creates the event with booking slots
+
+---
+
+**✍️ Content Generation**
+- [x] **Bio writer** — generates professional photographer bio from a few prompts
+- [x] **Gallery descriptions** — SEO-optimized descriptions per gallery (*"Describe my Austin sunset engagement gallery"*)
+- [x] **Blog post writer** — full blog posts (*"Write: 5 reasons to hire a professional photographer for your wedding"*)
+- [x] **Social media captions** — platform-specific captions for Instagram, Facebook, Pinterest, X/Twitter
+- [x] **Hashtag generator** — 30 targeted hashtags based on shoot type, style, and location
+- [x] **Client email drafts** — inquiry responses, follow-ups, gallery delivery emails, thank-you notes
+- [x] **Invoice & contract language** — help draft custom clauses, explain existing terms
+- [x] **Event/mini session descriptions** — write compelling booking page copy
+- [x] **Testimonial summarizer** — from multiple client reviews, generate one compelling summary quote
+- [x] **Email marketing campaigns** — write full newsletter content for photographer's mailing list
+- [x] **Website page copy** — help write About, Services, FAQ, Contact pages
+- [x] **Gallery name suggestions** — suggest gallery names based on event details
+
+---
+
+**📸 Photo Intelligence (Vision AI)**
+- [x] **AI photo culling** — rank photos by: sharpness, exposure, composition, facial expression quality (eyes open, genuine smile), subject placement
+- [x] **Duplicate / near-duplicate detector** — in a burst of 10 similar shots, identify the best one and flag the rest for deletion
+- [x] **Auto-tagging** — detect and tag: people, locations, scene types (indoor/outdoor/golden hour/night), events (wedding/portrait/cosplay/landscape)
+- [x] **Expression detector** — in portrait sessions, identify which shots have the best facial expressions
+- [x] **AI-generated alt text** — analyze actual photo content and write descriptive, SEO-friendly alt text
+- [x] **Smart album builder** — group uploaded photos into suggested albums by scene, subject, or time
+- [x] **Composition feedback** — analyze a photo's composition and provide constructive feedback
+- [x] **Photo-to-caption** — upload any photo → AI writes a caption for it
+- [x] **AI upscaling** — upscale low-res photos for print-quality output (Real-ESRGAN technology)
+- [x] **Watermark position optimizer** — AI suggests optimal watermark placement that avoids covering key subjects
+- [x] **Color palette extractor** — extract the dominant colors from a photographer's portfolio to suggest website brand colors
+- [x] **Sky & scene classifier** — identify which photos have skies suitable for enhancement, scenes suitable for certain print products
+
+---
+
+**📊 Business Intelligence**
+- [x] **Analytics insights in plain English** — *"Your Tuesday galleries get 3x more engagement than Friday ones. Consider posting new galleries on Tuesdays."*
+- [x] **Revenue insights** — *"Your print sales spike in November — consider running a holiday promotion in October"*
+- [x] **Pricing optimizer** — based on their market, niche, and experience, suggest competitive pricing for sessions and products
+- [x] **Client retention alerts** — *"You haven't heard from 5 repeat clients in over a year. Want me to draft a re-engagement email?"*
+- [x] **Gallery performance summary** — *"Your 'Golden Hour Portraits' gallery has 3x more saves than average. Consider promoting it."*
+- [x] **SEO site audit** — scan the photographer's entire website, score each page, give specific improvement suggestions
+- [x] **Booking conversion tips** — if inquiry-to-booking rate is low, AI suggests what to change in the booking flow
+
+---
+
+**💬 Client-Facing AI Widget (on Photographer's OWN website)**
+
+Photographers can optionally add an AI chat widget to their public portfolio website. Their clients and visitors can ask it questions:
+- [x] *"What packages do you offer?"* → AI answers based on the photographer's services/pricing page
+- [x] *"Are you available on June 14th?"* → AI checks the booking calendar and answers
+- [x] *"How long until I get my photos back?"* → AI answers based on the photographer's turnaround settings
+- [x] *"How do I download my photos?"* → AI explains the download process
+- [x] *"I'd like to book a session"* → AI collects client info and creates a lead in the photographer's CRM
+- [x] Fully trained on the photographer's own website content, services, and FAQ
+- [x] Photographer writes a short "About my business" prompt to personalize the AI's voice/tone
+- [x] Toggle on/off per website in the dashboard
+- [x] Uses photographer's own API key (no additional cost to MyShutterHost)
+
+---
+
+**🚀 Phase 3 — AI Style Trainer (Confirmed, Not Future)**
+- [x] **Train from existing Lightroom catalog** — select folders of already-edited work; AI learns from thousands of before/after develop setting pairs instantly
+- [x] **Train from existing Photoshop work** — reads Action history, layer structures, local adjustment patterns relative to face landmarks
+- [x] Folder selector with accuracy estimate ("3,810 training photos → estimated 91% accuracy")
+- [x] Per-shoot-type style profiles — separate learned styles for weddings, portraits, cosplay, golden hour, studio
+- [x] Style date filtering — exclude older work that doesn't represent current style
+- [x] Continuous background learning — every post-AI correction feeds back as training data
+- [x] Style accuracy dashboard — current %, training count, improvement over time graph
+- [x] Works in Lightroom only / Photoshop only / LR→PS hybrid mode
+
+**🚀 Future AI Roadmap (Phase 4)**
+- [ ] **AI shooting location finder** — based on desired mood/style, suggest nearby locations with GPS coordinates
+- [ ] **AI mood board generator** — describe a shoot concept → AI generates a mood board with color palettes and style references
+- [ ] **AI social media scheduler** — analyze engagement patterns and suggest/auto-schedule the optimal posting times
+- [ ] **AI style trainer v2** — vision-model based (CLIP embeddings) for even deeper style understanding beyond slider patterns
+- [ ] **AI equipment advisor** — based on what a photographer shoots, suggest gear upgrades with explanation of why
+- [ ] **Multilingual AI** — AI responds in the user's language automatically (ties into i18n)
+
+---
+
+### 📊 Module 9 — Analytics & Storage
+- [x] Analytics dashboard (page views, gallery views, top photos, visitor locations)
+- [x] External storage connection (link your own S3/Backblaze/Google Drive as overflow storage)
+- [x] Backup & version history (restore deleted photos)
+- [x] Storage usage dashboard (per photographer, per plan tier)
+- [x] Bandwidth and download tracking
+
+---
+
+### 👤 Module 10 — Platform Admin & Accounts
+- [x] Photographer account with subscription billing (Free / Pro / Studio tiers)
+- [x] Multi-photographer studio accounts (one studio, multiple photographer sub-accounts)
+- [x] Affiliate / referral program (refer a photographer, earn credits)
+- [x] Email marketing integration (Mailchimp, ConvertKit — build mailing list from fans/followers)
+- [x] Newsletter signup widget for photographer websites
+- [x] Multi-language / internationalization support (i18n)
+- [x] Mobile app (iOS + Android) for photographers to manage on the go *(Phase 4)*
+
+---
+
+### 👥 Module 11 — Client Accounts & Profiles
+
+Clients (the people who visit photographer websites) get their own accounts on MyShutterHost that track everything they do across all photographer sites on the platform.
+
+**Client Profile:**
+- [x] Client signup via email, Google, Facebook, or Apple (social login for easy onboarding)
+- [x] Profile photo upload
+- [x] Name, bio, location, website
+- [x] Public or private profile toggle
+- [x] Profile visible to photographers whose galleries they've interacted with
+
+**Activity Tracking (auto-tracked, visible to client):**
+- [x] **Photos liked** — all photos they've hearted across any gallery
+- [x] **Photos shared** — history of every share to social media
+- [x] **Photos purchased** — all digital downloads bought, with re-download links
+- [x] **Photos tagged in** — every photo they appear in or were tagged in
+- [x] **Print orders** — full order history, status, tracking numbers
+- [x] **Galleries visited** — history of galleries they've browsed
+- [x] **Galleries saved/bookmarked** — galleries they want to revisit
+- [x] **Wishlist** — photos saved to buy later
+
+**Bookings & Appointments:**
+- [x] Upcoming booked sessions with any photographer on the platform
+- [x] Past session history
+- [x] Session documents (contracts, invoices, questionnaires) in one place
+- [x] One-click rebooking with the same photographer
+
+**Stars & Tips Wallet:**
+- [x] Stars balance dashboard (how many stars they currently hold)
+- [x] Buy stars / credits directly from their profile (Stripe)
+- [x] Full stars sent history — which photographers they supported, when, how much
+- [x] Full tips sent history — tip amounts, dates, photographers
+- [x] Earned stars (if referral program is active)
+- [x] Stars expiry reminders (if stars expire after X months)
+
+**Followed Photographers:**
+- [x] Follow/unfollow photographers
+- [x] Feed of new galleries posted by followed photographers
+- [x] Notification when a photographer they follow posts a new gallery
+
+**Notifications:**
+- [x] In-app notification center (new tags, gallery ready, order shipped, etc.)
+- [x] Email notification preferences (opt-in/out per type)
+- [x] Push notifications (mobile app — Phase 4)
+
+**Privacy & Security:**
+- [x] Untag requests (remove themselves from tagged photos)
+- [x] Delete account + all personal data (GDPR right to erasure)
+- [x] Control who can tag them (anyone / only verified photographers / nobody)
+- [x] Two-factor authentication (2FA)
+
+**What to Use for Client Auth:**
+> Auth.js v5 already handles this — supports email/password + Google + Facebook + Apple OAuth out of the box. Client accounts and photographer accounts are the same auth system, just different roles.
+
+---
+
+### 🖥️ Module 12 — Photographer Dashboard & Admin Panel
+
+The photographer's private backend — everything they need to run their business.
+
+**Gallery & Content Management:**
+- [x] Upload, organize, and manage all galleries and photos
+- [x] Set download tiers per gallery (free low-res / paid standard / paid high-res / free high-res)
+- [x] Watermark settings (upload custom watermark, set position + opacity)
+- [x] Gallery visibility (public / private / password-protected / client-only)
+- [x] Schedule gallery publish date
+
+**Face Recognition Settings (per photographer account):**
+- [x] **Face search toggle** — enable or disable "Find My Photos" for their entire account
+- [x] **API provider selector** — choose between:
+  - AWS Rekognition (pay-per-use, ~$1/1,000 searches)
+  - Azure Face API (similar pricing, different accuracy profile)
+  - Disabled (no face search at all — for photographers who serve privacy-sensitive clients)
+- [x] **Per-gallery face search toggle** — even if enabled globally, they can disable for specific galleries (e.g. disable for a private boudoir gallery)
+- [x] Photographer enters their own AWS or Azure API key (they pay their own usage fees directly)
+- [x] Usage stats — how many face searches have been run this month
+
+**Store & Orders:**
+- [x] Order management (pending / in production / shipped / delivered)
+- [x] Shipping label generation (EasyPost — USPS, UPS, FedEx, DHL)
+- [x] Revenue dashboard (sales, downloads, tips, stars, payouts)
+- [x] Payout history (Stripe Connect)
+- [x] Product catalog management (prints, products, pricing)
+
+**Client Management:**
+- [x] Client list with profile photos and full history
+- [x] Per-client activity view (what they bought, tipped, shared, booked)
+- [x] Send messages to clients
+- [x] Client tags and notes (internal — clients don't see these)
+
+**Booking & Business:**
+- [x] Booking calendar (availability, session types, pricing)
+- [x] Contract templates (create once, reuse per booking)
+- [x] Invoice generator
+- [x] Wedding planner per event
+- [x] Lead management (inquiries → follow-up → booked)
+
+**Website Management:**
+- [x] WYSIWYG visual editor (Module 6)
+- [x] Domain & subdomain settings
+- [x] SEO settings per page
+- [x] Analytics (page views, top photos, visitor map, conversion rates)
+- [x] Social media feed connections (connect Instagram, TikTok for embedded feeds)
+
+**Account & Billing:**
+- [x] Subscription plan (upgrade/downgrade)
+- [x] Storage usage meter
+- [x] API key management (Lightroom/Photoshop plugin tokens)
+- [x] Notification preferences
+- [x] Two-factor authentication
+
+---
+
+### 🤝 Module 13 — TFP Collaboration Hub & Events
+
+**What is TFP?** Time For Print (also Trade For Print) — a common photography arrangement where photographer, model, makeup artist, stylist, etc. all work for free and each receives the final images in exchange.
+
+**Creative Discovery (find collaborators):**
+- [x] Searchable directory of creatives on the platform (photographers, models, cosplayers, MUAs, hair stylists, wardrobe stylists, location scouts)
+- [x] Creative profile cards (portfolio samples, specialties, location, availability, TFP-open badge)
+- [x] Filter by: creative type, location/distance, style, availability, experience level
+- [x] Star ratings & reviews between collaborators after shoots
+- [x] "Open to TFP" toggle on each user's profile
+- [x] Send collaboration request to any creative (triggers a notification + starts a chat room)
+
+**Shoot Planning Workspace (per collaboration):**
+- [x] Private group workspace per shoot (all team members invited)
+- [x] Shoot concept board (mood board with reference images, color palettes)
+- [x] Shot list builder (list of must-get shots, locations, outfits)
+- [x] Call sheet generator (time, location, parking, roles, emergency contacts)
+- [x] Availability polling ("what dates work for everyone?" — like Doodle but built-in)
+- [x] Shoot date confirmed → auto-added to all members' calendars
+- [x] Post-shoot: photographer marks who gets which images, delivers gallery link
+
+**TFP Contracts & Media Releases:**
+- [x] Pre-built TFP agreement template (no money exchanged, image usage rights defined)
+- [x] Model/subject media release template (photographer can use images for portfolio, social, etc.)
+- [x] Location release template
+- [x] Cosplay-specific release (handles character IP considerations)
+- [x] All parties sign digitally inside the platform before the shoot
+- [x] Signed contracts stored in each user's document history
+- [x] Custom contract fields (photographer can add custom clauses)
+
+**Events & Mini Sessions Board (public-facing on photographer's website):**
+- [x] Dedicated Events page on photographer's website (own nav menu item)
+- [x] Event listings: title, date, location, description, cover photo, spots available
+- [x] Event types: public shoot event, mini session, workshop, convention appearance, styled shoot
+- [x] Mini session booking: limited time slots (e.g. "Saturday April 5th — 10am / 11am / 12pm — $150 for 30 min")
+- [x] "Book a slot" button → goes straight to Stripe checkout
+- [x] Countdown timer on upcoming events ("12 days away")
+- [x] Spots remaining counter ("3 of 8 slots left")
+- [x] RSVP for free events
+- [x] Share event to Facebook, Instagram, X with one click
+- [x] **Facebook Events sync** — publish event to Facebook Events automatically via Facebook Graph API
+- [x] Event reminder emails to people who RSVP'd or booked
+- [x] Past events archive (shows previous shoots, links to the gallery)
+- [x] Embed events widget on external websites (share your mini session calendar anywhere)
+
+**Social Linking for Events:**
+- [x] Link any event to an existing Facebook Group or Facebook Event page
+- [x] Link to Instagram post or story about the event
+- [x] Share event QR code (for printing and posting at venues, conventions, etc.)
+- [x] Auto-post new events to connected social media accounts
+
+---
+
+### 💬 Module 14 — Real-time Chat & Messaging
+
+A **Facebook Messenger + Discord hybrid** built directly into the platform. Users never have to leave MyShutterHost to communicate.
+
+**Tech: Socket.io** — runs self-hosted on your Vultr server as part of the Next.js app. Zero extra monthly cost, fully controlled, no third-party dependency.
+
+**Direct Messages (Messenger-style):**
+- [x] 1-on-1 private DMs between any two users (photographers, clients, models, collaborators)
+- [x] Message history stored in PostgreSQL
+- [x] Seen / delivered receipts
+- [x] Typing indicator ("Jane is typing...")  
+- [x] Emoji reactions on messages
+- [x] Reply to a specific message (threaded reply)
+- [x] Share photos/files directly in chat (stored on Cloudflare R2)
+- [x] Share gallery links — renders a preview card in-chat
+- [x] Send a booking request directly from chat ("Book a session" button)
+- [x] Archive / delete conversations
+- [x] Block / report users
+
+**Group Shoot Rooms (Discord-style):**
+- [x] Automatic group room created for every TFP collaboration or booked shoot team
+- [x] Named channels within a room (e.g. #general, #shot-list, #mood-board, #logistics)
+- [x] Pin important messages (pinned call sheet, shoot date, directions)
+- [x] @mention team members
+- [x] Role labels in group (Photographer, Model, MUA, Stylist, etc.)
+- [x] Share mood board images directly in the room
+- [x] File attachments (contracts, PDFs, reference images)
+- [x] Room archived after shoot completes (history preserved for reference)
+
+**Notifications:**
+- [x] In-app notification badge (unread message count)
+- [x] Email notification for new messages (if user is offline)
+- [x] Push notifications (mobile app — Phase 4)
+- [x] "Do not disturb" mode
+
+**Platform Connections (link, don't replace):**
+- [x] Link a Facebook Messenger conversation from chat (photographer can paste their Messenger link)
+- [x] Link a Discord server from a group room
+- [x] These are just shortcut links — core communication always happens inside MyShutterHost
+
+---
+
+
+| Your Feature | Status |
+|---|---|
+| Photo gallery | ✅ Module 1 |
+| Video gallery | ✅ Module 1 |
+| Point of sale (photos, prints, products) | ✅ Module 2 |
+| Social media sharing | ✅ Module 3 |
+| Like & share for galleries + individual pics | ✅ Module 3 |
+| Send galleries/pics to friends on social media | ✅ Module 3 |
+| Pay to download | ✅ Module 2 |
+| Accept tips | ✅ Module 2 |
+| Hearts & Stars micropayment system | ✅ Module 2 |
+| Contracts | ✅ Module 4 |
+| Booking calendar | ✅ Module 4 |
+| Watermarks | ✅ Module 1 |
+| External storage | ✅ Module 9 |
+| Lightroom plugin | ✅ Module 7 |
+| Photoshop plugin | ✅ Module 7 |
+| Import/export presets | ✅ Module 7 |
+| Photo culling | ✅ Module 1 + Module 8 |
+| Wedding planner | ✅ Module 4 |
+| Portfolios | ✅ Module 6 |
+| Music for photo albums | ✅ Module 1 |
+| Photographer profile page | ✅ Module 6 |
+| AI chatbox | ✅ Module 8 |
+| Embedded social media feeds | ✅ Module 3 |
+| Subscriptions | ✅ Module 10 |
+| Customizable UI & templates | ✅ Module 6 |
+| Pre-made templates | ✅ Module 6 |
+
+---
+
+## 💡 Suggested Features You Didn't Mention (Worth Considering)
+
+> [!NOTE]
+> These are common features on top photography platforms that you may want to add.
+
+| Suggested Feature | Why It Matters |
+|---|---|
+| **Print lab integrations** (WHCC, Printful, Bay Photo) | Without these, print orders have no fulfillment — you need a real lab to print and ship |
+| **Client CRM** | Track leads → booked → shot → delivered workflow |
+| **Digital contracts + e-signatures** | Legally protects photographers (model releases, session agreements) |
+| **Invoicing & payment requests** | Photographers often invoice separately from store sales |
+| **Mood board builder** | Clients share style inspiration before the shoot |
+| **Intake questionnaires** | Photographers send forms to clients before sessions |
+| **Preset marketplace** | Photographers can sell/share presets — a revenue stream for you |
+| **Affiliate/referral program** | Viral growth — photographers refer others, earn credits |
+| **Email marketing integration** | Build a mailing list from fans who love their work |
+| **Multi-photographer studio accounts** | Studios with 5+ photographers need team management |
+| **SEO tools built in** | Photographers need their sites to rank on Google |
+| **Geographic/map gallery view** | "Photos taken in Paris" — great for travel photographers |
+| **EXIF data display** | Photography enthusiasts love seeing camera settings |
+| **Embeddable gallery widget** | Lets photographers embed galleries on external blogs/sites |
+| **Gift cards** | Great for holiday print sales |
+| **Coupon/discount codes** | Session promotions, holiday sales |
+| **Mobile app** (Phase 4) | Manage galleries, approve bookings, check sales on the go |
+| **QR code generator** | Print QR codes at events linking to gallery |
+| **Multi-language (i18n)** | International photographers |
+
+---
+
+## Development Phases
+
+### 🛠️ Module 15 — Support & Platform Transparency
+
+> Lives inside the **super-admin panel** (your side) and the **user's profile** (their side). Not a separate website — fully integrated into the existing apps.
+
+**Support Ticket Submission (user side — in their profile/dashboard):**
+- [x] "Submit a Support Ticket" form in user's dashboard profile section
+- [x] Fields: ticket type (Bug / Feature Request / General Help), title, description, severity, optional screenshot upload
+- [x] After submitting, ticket appears in their **"My Support Tickets"** section in their profile
+- [x] Ticket status visible in-profile: Submitted → Under Review → In Progress → Resolved → Closed
+- [x] In-app notification when ticket status changes (default — no email required)
+- [x] **Email notifications: opt-in only** — user can toggle "Email me when my ticket updates" in their notification settings
+- [x] User can add follow-up comments to an open ticket
+- [x] User can mark a resolved ticket as "Still Having This Issue" to reopen it
+
+**Support Ticket Management (your side — super-admin panel):**
+- [x] All tickets listed in a dedicated **Support** section of your super-admin panel
+- [x] Filter by: status, severity, ticket type, date submitted, user
+- [x] Click any ticket to see full details, user info, and screenshot
+- [x] Update ticket status from the admin panel → triggers in-app notification to the user
+- [x] Add internal admin notes (not visible to user)
+- [x] Reply to user directly from the ticket (message appears in their ticket thread)
+- [x] Mark duplicate tickets and link them together
+- [x] Assign tickets to a release version / milestone
+
+**Changelog & Update Notes (admin posts, users read):**
+- [x] You write changelog entries in the super-admin panel using a rich text editor (TipTap)
+- [x] Entries tagged by version (v1.4.0) and type: 🐛 Bug Fix / ✨ New Feature / 🔧 Improvement
+- [x] Changelog page visible on MyShutterHost.com and inside the photographer dashboard
+- [x] **"What's New"** bell icon in the dashboard shows unread changelog entries
+- [x] Email digest: opt-in only — users can choose to receive changelog summaries
+
+**Feature Roadmap & Suggestions (community-driven):**
+- [x] Users submit feature suggestions from their profile or the roadmap page
+- [x] Upvoting — users upvote suggestions they want most
+- [x] You review suggestions in the admin panel and move them to the roadmap
+- [x] Public roadmap shows: 💭 Considering → 📌 Planned → 🔧 In Progress → ✅ Shipped
+- [x] In-app notification (opt-in email) when a suggestion the user voted for ships
+
+**Planned Maintenance Notices:**
+- [x] You post planned downtime notices in the admin panel
+- [x] Banner auto-appears in the photographer dashboard and on MyShutterHost.com before the window
+- [x] In-app notification sent to all users when a maintenance window is posted
+
+**Tech for this module — nothing new needed:**
+- PostgreSQL stores tickets, changelog entries, roadmap items, votes
+- TipTap (already in stack) for rich text changelog entries
+- Socket.io (already in stack) for real-time in-app ticket status notifications
+- Resend (already in stack) for opt-in email notifications only
+
+---
+
+
+**Goal**: Get photographers live with a website, gallery, and ability to sell.
+- Photographer signup, auth, onboarding
+- Photo + video gallery upload
+- 5 pre-built templates + basic customizer
+- Custom subdomain
+- Photographer profile page
+- Pay-to-download + print store (Printful integration)
+- Stripe billing (subscriptions + store payments)
+- Watermarking
+- Social sharing (Facebook, Pinterest, X)
+- Basic SEO tools
+
+### Phase 2 — Client & Business Tools
+**Goal**: Turn MyShutterHost into a full business platform.
+- Client proofing galleries (password-protected)
+- Booking calendar + contracts + e-signatures
+- Invoicing & payment requests
+- Wedding planner
+- Client CRM
+- Intake questionnaires + mood boards
+- Tips + Hearts & Stars micropayment system
+- Advanced template customizer (drag-and-drop)
+- Custom domain (BYOD)
+- Blog/journal
+- Embedded social media feeds
+- Analytics dashboard
+
+### Phase 3 — Power Tools & AI
+**Goal**: Give photographers tools no competitor offers.
+- Lightroom plugin (push to gallery)
+- Photoshop plugin (export to gallery)
+- Preset import/export + preset marketplace
+- Photo culling tool (manual + AI-assisted)
+- AI chatbox
+- AI auto-tagging + gallery descriptions + alt-text
+- Music for photo albums
+- Slideshow creator
+- Email marketing integration
+- Affiliate/referral program
+- Multi-photographer studio accounts
+- External storage connections
+- Geographic/map gallery view
+
+### Phase 4 — Mobile & Scale
+**Goal**: Mobile-first management + international growth.
+- iOS + Android app for photographer management
+- Multi-language support (i18n)
+- Advanced print lab integrations (WHCC, Bay Photo, Miller's)
+- AI skin retouching presets
+- Gift cards + coupon codes
+- Embeddable gallery widget (embed on external sites)
+
+---
+
+## Pricing Tiers (Updated)
+
+### Vultr Server Setup
+
+**Phase 1 (Launch) — Everything on one server:**
+```
+┌─────────────────────────────────────┐
+│         Single Vultr VPS            │
+│         (Coolify manages all)       │
+│                                     │
+│  ┌─────────┐  ┌──────┐  ┌───────┐  │
+│  │ Next.js │  │  PG  │  │ Redis │  │
+│  │  App    │  │  DB  │  │ Cache │  │
+│  └─────────┘  └──────┘  └───────┘  │
+│         (Docker containers)         │
+└─────────────────────────────────────┘
+             ↑
+     Cloudflare CDN sits in front
+```
+
+**Phase 2 (Post-Launch) — Migrate DB to dedicated server:**
+```
+┌──────────────────┐     ┌─────────────────────┐
+│  Vultr VPS #1    │     │   Vultr VPS #2       │
+│  (App Server)    │────▶│   (Database Server)  │
+│                  │     │                      │
+│  ┌────────────┐  │     │  ┌──────┐  ┌───────┐ │
+│  │ Next.js    │  │     │  │  PG  │  │ Redis │ │
+│  │ App        │  │     │  │  DB  │  │ Cache │ │
+│  └────────────┘  │     │  └──────┘  └───────┘ │
+└──────────────────┘     └─────────────────────┘
+```
+> **Migration is easy** — just update the `DATABASE_URL` environment variable in Coolify to point to the new server. Prisma doesn't care where the DB lives.
+
+> [!NOTE]
+> When you're ready to split, use `pg_dump` to export the database and `pg_restore` to import it on the new server. Zero code changes required — just an env var update in Coolify.
+
+| Tier | Price | Storage | Key Features |
+|------|-------|---------|--------------|
+| **Free** | $0/mo | 5 GB | 3 galleries, subdomain only, watermark |
+| **Pro** | $29/mo | 200 GB | Unlimited galleries, custom domain, store, booking |
+| **Studio** | $79/mo | 1 TB | Everything + Lightroom/PS plugins, multi-user, analytics |
+| **Enterprise** | Custom | Unlimited | White-label, API access, dedicated support |
+
+---
+
+## ✅ All Decisions Resolved
+
+### 1. Print Fulfillment
+- **Printful** — easiest integration, wide product range, global fulfillment
+- **WHCC** — professional lab quality, preferred by serious photographers
+- **Self-fulfillment** — photographer prints their own, handles their own shipping; platform just manages the order, address, and payment
+- Photographer chooses one or more in their dashboard. Can run all three simultaneously (e.g. self-fulfill local orders, use WHCC for pro prints, Printful for merchandise)
+
+### 2. Hearts & Stars Micropayment Tiers
+Platform sets fixed rates (not photographer-defined). Each icon = a different tier with a fixed dollar value:
+
+| Icon | Name | Value | Use Case |
+|------|------|-------|----------|
+| 💙 | Heart | $0.10 | Quick appreciation |
+| ⭐ | Star | $0.25 | Nice work! |
+| 💫 | Shooting Star | $0.50 | Wow, great shot |
+| 💎 | Diamond | $1.00 | Exceptional work |
+| 👑 | Crown | $5.00 | True fan support |
+| 🔥 | Fire | $10.00 | Top supporter |
+
+Clients buy icon packs (e.g. 10 Hearts for $1.00). Platform takes a small % cut (e.g. 10%). Photographer gets the rest via Stripe Connect payout.
+
+### 3. Plugin Distribution
+- **Primary**: Direct download from MyShutterHost plugin marketplace
+- **Photographer-created plugins**: Any photographer can build and list their own Lightroom/Photoshop plugin on the marketplace, either free or paid
+- **Open-source option**: Photographers can mark plugins as open-source with a GitHub link
+- **Adobe Exchange**: Optional secondary distribution — photographers can choose to also list on Adobe Exchange
+- Platform takes a % cut of paid plugin sales (revenue stream for MyShutterHost)
+- Plugin submissions go through a basic review process before listing (prevent malware)
+
+### 4. Video Storage — Multi-Tier Options
+Photographers choose their video storage method in their dashboard:
+
+| Option | Cost | Best For |
+|--------|------|----------|
+| **Cloudflare Stream** (paid) | ~$5/1,000 min stored | Photographers who want zero infrastructure hassle |
+| **Self-hosted via PeerTube** | Server cost only | Photographers who want full control + no per-minute fees |
+| **BYO Cloudflare Stream account** | Their own CF billing | Photographers who already have a Cloudflare account |
+| **BYO S3/R2 bucket** | Their own storage cost | Power users with existing storage setups |
+| **Free tier (limited)** | Included in subscription | Short clips only, limited minutes per month |
+
+### 5. AI Provider — User-Selectable in Dashboard
+Photographers bring their own API key. The dashboard **AI Settings** section includes:
+- Provider selector: OpenAI (GPT-4o) / Anthropic (Claude) / Google (Gemini)
+- API key input field
+- **"Get API Key"** button — opens the correct provider's API key page in a new tab
+- Test connection button — verifies the key works before saving
+- Usage display — shows approximate token usage this month
+- Fallback: if no API key set, AI chatbox uses a limited MyShutterHost shared key (rate-limited)
+
+### 6. White-Label & Branding by Subscription Tier
+
+| Tier | Branding | Domain | Features |
+|------|----------|--------|----------|
+| **Free** | "Powered by MyShutterHost" badge visible | `name.myshutterhost.com` only | Limited galleries, limited storage, watermarked downloads |
+| **Pro** | Badge can be hidden | Custom domain (BYOD) | Full store, booking, unlimited galleries |
+| **Studio** | No badge, custom logo in dashboard | Custom domain | All features + plugins + multi-user |
+| **Enterprise** | Full white-label (your brand, zero MyShutterHost mention) | Custom domain + custom email domain | Everything + API access + priority support |
+
+### 7. Mobile App — React Native + Expo
+- **Framework**: React Native with Expo (cross-platform — one codebase, iOS + Android)
+- **Why Expo**: Expo Go for easy dev testing, EAS Build for production, OTA updates without app store resubmission
+- Shares TypeScript types and API client code with the main Next.js app (monorepo benefit)
+- Phase 4 delivery
+
+### 8. Team Size — Solo Developer (You)
+- Build order prioritizes **vertical slices** over horizontal (ship something real in Phase 1)
+- Automated tests are critical — Vitest for unit tests, Playwright for E2E (prevents regressions as solo dev)
+- Coolify makes deployment a one-person job (no DevOps team needed)
+- Modular architecture (each module is independent) means you can hand off modules to future hires
+
+---
+
+## 💡 Additional Features to Add
+
+### 🛡️ Platform Super-Admin Panel (for you, the owner)
+- View all photographers on the platform
+- Manage subscriptions, manually apply credits
+- Content moderation dashboard (reported photos, flagged content)
+- Revenue overview (platform-wide earnings, payout history)
+- Plugin marketplace approvals
+- Dispute resolution tools (print order issues, contract disputes)
+- Platform-wide announcement system (notify all photographers of updates)
+
+### 🛡️ Content Moderation
+- Report button on any photo, gallery, profile, or chat message
+- Auto-flag system (AI scans uploads for prohibited content)
+- Manual review queue in super-admin panel
+- DMCA takedown request form (photographers can report their stolen images)
+- **Copyright protection tools**: reverse image search integration to find unauthorized use of photographer's images
+
+### 🌍 GDPR & Privacy Compliance
+- Cookie consent banner (configurable per photographer's site)
+- Privacy policy generator for photographer sites
+- Data export tool (client requests their data — GDPR right of access)
+- Account deletion + full data erasure (GDPR right to erasure)
+- Face search consent prompt (shown before any visitor uses "Find My Photos")
+
+### 🔍 Photography-Specific SEO Schema
+- Auto-generate `LocalBusiness` schema for photographer profile
+- `Photograph` schema markup on individual photos
+- `Person` schema for photographer bio
+- `Event` schema for mini sessions and events
+- These make Google show rich results (star ratings, event dates, etc.) in search
+
+### 🛠️ Staging Environment
+- Coolify supports multiple environments on the same server
+- **Dev** → **Staging** → **Production** pipeline
+- Push to `develop` branch → deploys to staging for testing
+- Push to `main` branch → deploys to production
+- Staging uses separate DB and separate Cloudflare R2 bucket
+
+### 💰 Platform Monetization Model (how MyShutterHost earns)
+| Revenue Stream | Rate | Notes |
+|---|---|---|
+| Subscription fees | $0 / $29 / $79 / Custom | Primary revenue |
+| Hearts & Stars platform cut | 10% of all micropayments | Passive income |
+| Tip platform cut | 5% of all tips | Passive income |
+| Plugin marketplace cut | 20% of paid plugin sales | Revenue share |
+| Preset marketplace cut | 20% of paid preset sales | Revenue share |
+| Print commission (self-fulfill) | Optional % on orders | If photographer uses platform payment processing |
+| Affiliate program | Credits (not cash) | Reduces churn, not direct revenue |
+
+---
+
+## Updated Tech Stack Additions
+| Layer | Choice |
+|-------|--------|
+| **Mobile App** | React Native + Expo (iOS + Android, Phase 4) |
+| **Self-hosted Video** | PeerTube (Docker container on Coolify) |
+| **Error Monitoring** | Sentry (catches bugs in production automatically) |
+| **Staging Pipeline** | Coolify multi-environment (dev → staging → prod) |
+
+---
+
+## ⚠️ Solo Developer Build Strategy
+
+> [!IMPORTANT]
+> Building this alone is very achievable but requires discipline. Here's the recommended approach:
+
+1. **Build vertically, not horizontally** — Ship a complete working slice (auth + one gallery + one template + Stripe) before building the next feature
+2. **Phase 1 is the business** — Get photographers paying before building Phase 3/4
+3. **Use AI aggressively** — AI coding assistance (like this session) dramatically multiplies solo dev output
+4. **Don't build what you can buy** — Use Stripe for billing, EasyPost for shipping, Auth.js for auth. Only build what's unique to MyShutterHost
+5. **Automated tests from day one** — As sole developer, tests are your safety net
+6. **Launch with 3 templates, not 8** — Polish 3 templates perfectly rather than 8 mediocrely
+7. **Hire a designer** — Even a one-time contract designer for the template themes will be worth it
+
