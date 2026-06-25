@@ -4,52 +4,49 @@
 
 ---
 
-## 🏗️ Three Distinct Products — Platform Architecture
+## 🏗️ Platform Architecture — Two Surfaces, One Codebase
 
 > [!IMPORTANT]
-> The platform is THREE interconnected products sharing one codebase (monorepo) and one backend.
+> The platform has TWO user-facing surfaces sharing one codebase (monorepo) and one backend.
+> The marketing pages and social network are **sections of the same domain** — not separate websites.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  PRODUCT 1: [Platform].com — Marketing & Company Site           │
+│  SURFACE 1: [Platform].com  (ONE domain — two contexts)         │
 │                                                                 │
-│  • Public landing page + pricing + creator type showcase        │
+│  ── Logged-out / Marketing ────────────────────────────────     │
+│  • Landing page, pricing, creator type showcase                 │
 │  • Creator signup & subscription purchase                       │
-│  • Tech support, bug reports, changelog, status page            │
-│  • Platform blog, tutorials, community resources                │
-│  URL: [platform].com/about, /pricing, /blog, /support           │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓ Subscribes / Joins
-┌─────────────────────────────────────────────────────────────────┐
-│  PRODUCT 2: The Creator Social Network (Main Platform)          │
+│  • Blog, tutorials, changelog, support, status page             │
+│  URLs: /  /about  /pricing  /blog  /support  /changelog         │
 │                                                                 │
-│  • Global discovery feed (public, no login required)            │
-│  • Creator social profiles  →  [platform].com/@username         │
+│  ── Logged-in / Social Network ────────────────────────────     │
+│  • Global discovery feed (also public — no login required)      │
+│  • Creator social profiles: [platform].com/@username            │
 │  • Event calendar, Looking For board, Creator discovery map     │
-│  • Groups, chat, community spaces                               │
-│  • Collaborative revenue sharing                                │
-│  • ALL creator types: Photographers, Models, Actors,            │
-│    Cosplayers, MUAs, Videographers, Fashion Designers, etc.     │
+│  • Groups, chat, community spaces, collaborative revenue        │
+│  • ALL creator types live here                                  │
+│  URLs: /  /explore  /events  /board  /@username  /dashboard     │
 │                                                                 │
-│  FREE: Supporters get social profiles (no website, no tools)    │
-│  FREE: Creator Free tier — limited tools, NO website            │
+│  FREE: Supporters — social profile, follow, tip, buy            │
+│  FREE: Creator Free — limited tools, NO dedicated website       │
 │  PAID: Creator Pro/Studio/Enterprise — full tools + website     │
 └─────────────────────────────────────────────────────────────────┘
                               ↓ Included in paid Creator plans
 ┌─────────────────────────────────────────────────────────────────┐
-│  PRODUCT 3: Creator Dedicated Websites (Hosted for ALL types)   │
+│  SURFACE 2: Creator Dedicated Websites  (separate subdomain)    │
 │                                                                 │
-│  Every paid Creator gets their own professional website         │
-│  POWERED BY THE SAME BACKEND as their social profile.           │
-│  Same galleries, same bookings, same store, same posts.         │
+│  Every PAID Creator gets their own professional website.        │
+│  This IS a different URL — but powered by the same backend.     │
+│  Same galleries, bookings, store, and posts as their profile.   │
 │  The website is a professional-first view of the same data.     │
 │                                                                 │
-│  URL options (all plans):                                       │
-│    username.[platform].com          (subdomain, all plans)      │
-│    www.theircustomdomain.com        (custom domain, Pro+)       │
-│    [platform].com/meet/username     (event card, all plans)     │
+│  URL options by plan:                                           │
+│    username.[platform].com       (subdomain — Pro+)             │
+│    www.theircustomdomain.com     (custom domain — Studio+)      │
+│    [platform].com/meet/username  (event card — all plans)       │
 │                                                                 │
-│  Available to ALL creator types (not just photographers):       │
+│  Available to ALL creator types:                                │
 │    📸 Photographer  → gallery, print shop, client delivery      │
 │    🎬 Videographer  → showreel, video delivery, booking         │
 │    👤 Model         → comp card, tearsheets, casting page       │
@@ -59,7 +56,7 @@
 │    👗 Fashion Dsgn  → lookbooks, collections, pattern shop      │
 │    📸 Studio        → team portfolio, studio rental, booking    │
 │    💇 Hair Stylist  → style portfolio, service menu, booking    │
-│    🎨 Stylist       → look portfolios, brand collabs            │
+│    🎨 Stylist/Nail  → look portfolios, nail art, brand collabs  │
 │    🎬 Talent Agency → talent roster, booking requests           │
 │    + all other creator types                                    │
 └─────────────────────────────────────────────────────────────────┘
