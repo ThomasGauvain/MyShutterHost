@@ -1875,8 +1875,10 @@ NEW: Creative Professional Social Network + Business Platform
 
 Serves: Photographers, Videographers, Models, Actors, Cosplayers,
         MUAs, Fashion Designers, Photography Studios, Stylists,
-        Cinematographers, Art Directors, Set Designers, Talent Agencies,
-        and more — all in one ecosystem.
+        Fire Spinners, Circus Performers, Aerialists, Dancers,
+        Magicians, Musicians, DJs, Comedians, Buskers, Stunt
+        Performers, Body Painters, Tattoo Artists, Performance
+        Troupes, and more — all in one ecosystem.
 ```
 
 ---
@@ -1889,21 +1891,88 @@ Serves: Photographers, Videographers, Models, Actors, Cosplayers,
 - [x] **Cinematographer / DP** — gear list, production credits, reel hosting
 - [x] **Photography Studio** — multi-photographer accounts, studio rental, equipment list
 
-*Talent & Performance:*
-- [x] **Model** (fashion, commercial, fitness, glamour, plus-size, etc.)
+*Models & Talent:*
+- [x] **Model** (fashion, commercial, fitness, glamour, plus-size, petite, etc.)
 - [x] **Actor** — résumé, headshots, demo reel, credits, audition material
 - [x] **Cosplayer** — character portfolio, convention schedule, build journal, commission store
-- [x] **Dancer / Performer** — performance portfolio, class/workshop booking
+- [x] **Voice Actor** — audio reel hosting, demo clips, casting page
 
-*Creative Support:*
-- [x] **MUA / Makeup Artist** — beauty portfolio, service menu, kit info, certifications
-- [x] **Stylist / Fashion Stylist** — look portfolios, brand collabs
-- [x] **Fashion Designer** — lookbooks, collections, pattern/digital sales, runway events
-- [x] **Art Director / Set Designer** — production case studies, set portfolio
-- [x] **Hair Stylist** — style portfolio, booking, service menu
+*🔥 Fire & Flow Arts:*
+- [x] **Fire Spinner / Fire Dancer** — poi, staff, fans, rope dart, dragon staff, buugeng
+- [x] **Fire Breather / Fire Eater** — performance portfolio, safety certifications
+- [x] **Poi Spinner** — non-fire: LED poi, glow poi, contact poi
+- [x] **Hoop Artist** — hula hoop, LED hoop, multi-hoop, isolations
+- [x] **Flow Artist** — general flow props (fans, orbs, contact ball, ribbons)
+- [x] **Fire Juggler** — torch juggling, fire clubs, fire rings
+
+*🎪 Circus Arts:*
+- [x] **Juggler** — balls, clubs, rings, torches, diabolos, devil sticks, cigar boxes
+- [x] **Acrobat / Gymnast** — tumbling, partner acrobatics, hand balancing
+- [x] **Aerialist** — aerial silks, aerial hoop (lyra), trapeze (static/flying/dance), aerial straps, aerial rope
+- [x] **Contortionist / Flexibilist** — flexibility performance, partner contortion
+- [x] **Tightrope / Slackline Artist** — wire walking, slacklining
+- [x] **Unicyclist** — standard, giraffe, ultimate wheel, trials
+- [x] **Stilt Walker** — drywall stilts, peg stilts, spring stilts, character stilts
+- [x] **Human Statue / Living Statue** — interactive street art
+- [x] **Clown / Physical Comedian** — classic clown, new circus clown, bouffon
+- [x] **Escape Artist** — Houdini-style escape performance
+- [x] **Equilibrist / Balance Artist** — rola bola, spinning plates, peacock feather balancing
+- [x] **Sideshow Performer** — sword swallowing, glass walking, human blockhead, strongman
+
+*🎩 Magic & Illusion:*
+- [x] **Stage Magician / Illusionist** — full stage illusions, grand illusions
+- [x] **Close-up Magician** — sleight of hand, table magic, walkabout magic
+- [x] **Mentalist** — mind reading, psychological illusion, prediction
+- [x] **Cardician** — card magic specialist
+
+*💃 Dance:*
+- [x] **Ballet Dancer** — classical ballet, contemporary ballet
+- [x] **Contemporary / Modern Dancer**
+- [x] **Hip-hop / Street Dancer** — breaking, popping, locking, krump, waacking
+- [x] **Ballroom / Latin Dancer** — salsa, tango, foxtrot, cha-cha, samba
+- [x] **Pole Artist / Pole Fitness** — artistic pole, sport pole
+- [x] **Belly Dancer** — tribal, fusion, cabaret
+- [x] **Burlesque Performer** — neo-burlesque, classic burlesque
+- [x] **Flamenco Dancer**
+- [x] **Irish / Folk Dancer**
+- [x] **Go-go / Event Dancer** — nightclub, corporate event, festival
+- [x] **Exotic / Sensual Dancer** (age-verified adult content controls)
+
+*🎭 Stage & Live Performance:*
+- [x] **Stand-up Comedian** — set clips, upcoming shows, booking
+- [x] **Improv / Sketch Performer** — troupe profiles, show schedule
+- [x] **Spoken Word Artist / Slam Poet** — audio + video of performances
+- [x] **Performance Artist** — conceptual / installation / live art
+- [x] **Mime Artist**
+- [x] **Puppeteer** — marionette, hand puppet, shadow puppet, ventriloquist
+- [x] **Street Performer / Busker** — location schedule, pitch info
+- [x] **Character Entertainer** — mascots, themed characters for events
+
+*⚔️ Specialty Physical Arts:*
+- [x] **Stage Combat / Sword Fighter** — choreography portfolio, safety training display
+- [x] **Stunt Performer** — stunt reel, union affiliations, specialty skills
+- [x] **Martial Artist** (demo/showcase performer) — discipline, dojo, competition record
+- [x] **Pro Wrestler / Lucha Libre** — match clips, character persona, promotion affiliations
+- [x] **Parkour / Freerunning Artist**
+
+*🎵 Music Performance:*
+- [x] **Musician / Solo Artist** — performance videos, discography, upcoming shows, booking
+- [x] **Band / Music Group** — multi-member group profile, set list, rider
+- [x] **DJ / Electronic Artist** — mix portfolio, setlists, event bookings
+- [x] **Drummer / Percussionist** (especially visual performance / drum corps)
+
+*🎨 Body Arts:*
+- [x] **Body Painter** — portfolio by theme/event, live painting bookings
+- [x] **Tattoo Artist** — portfolio by style, appointment booking (crosses into creative service)
+
+*🎪 Performance Companies & Groups:*
+- [x] **Circus Troupe / Fire Company** — group profile with individual performer sub-profiles, group bookings
+- [x] **Dance Company** — company profile, roster, performance schedule
+- [x] **Theater Company** — production portfolio, audition announcements, show schedule
 
 *Business:*
 - [x] **Talent Agency** — multi-talent roster, booking requests for represented talent
+- [x] **Event Producer / Festival Organizer** — event portfolios, performer recruitment board
 - [x] **Brand / Business** — sponsor profiles, collab opportunities, advertising
 
 ---
@@ -1962,6 +2031,31 @@ Serves: Photographers, Videographers, Models, Actors, Cosplayers,
 - [x] Kit / product brand list
 - [x] Training and certification display
 - [x] On-location vs. studio booking toggle
+
+*🔥 Performing Artists (Fire, Circus, Dance, Stage, Magic & more):*
+- [x] **Performance showreel** — video portfolio is the primary asset (Cloudflare Stream hosted)
+- [x] **Performance photo gallery** — high-quality stills from shows (fire photography, aerial shots, stage shots)
+- [x] **Technical rider** — space requirements, power needs, fire safety equipment, music/sound needs, insurance requirements — downloadable PDF for venues
+- [x] **Safety certifications display** — fire safety certs, rigging certifications, insurance info (critical for event/venue bookings)
+- [x] **Insurance info display** — public liability insurance details (venues require this before booking)
+- [x] **Performance packages** — priced by format and duration:
+  - Walkabout (roaming entertainment, billed per hour)
+  - Short set (5–10 min stage show)
+  - Full show (20–45 min stage production)
+  - Workshop / class (teach the art form, billed per student)
+  - Private event (birthday / corporate / wedding entertainment)
+  - Festival / outdoor event
+- [x] **Venue type suitability tags** — Outdoor / Indoor / Stage / Walkabout / Corporate / Festival / Intimate / 18+ venue
+- [x] **Troupe / company profile** — group of performers bookable as a unit, with individual performer sub-profiles linked
+- [x] **Prop & equipment list** — what they bring, what the venue needs to provide
+- [x] **Performance duration options** — selectable at booking time
+- [x] **Skill discipline tags** — fire poi / aerial silks / juggling / magic / etc. (searchable/filterable)
+- [x] **"Book for event" type** — Festival / Corporate / Wedding / Birthday / Theater / Street Fair / Club / Private
+- [x] **Upcoming live show schedule** — where they're performing next (public calendar)
+- [x] **Workshop availability** — book them to teach your group the skill
+- [x] **TFP shoot availability** — available for fire/performance photography collaborations
+- [x] **Audience & venue size range** — intimate 10-person / small venue 50 / medium 200 / large 500+ / festival
+
 
 *👗 Fashion Designer:*
 - [x] **Lookbook galleries** — organized by collection (Spring 2026, Fall 2026, etc.)
