@@ -1,0 +1,75 @@
+# ============================================================
+# MyShutterHost — Local Development Environment
+# ============================================================
+# Runs PostgreSQL, Redis, and pgAdmin locally in Docker.
+# Mirrors the production setup on Vultr/Coolify exactly.
+#
+# USAGE:
+#   Start:   docker compose up -d
+#   Stop:    docker compose down
+#   Logs:    docker compose logs -f
+#   Reset:   docker compose down -v  (WARNING: deletes all local data)
+# ============================================================
+
+services:
+
+  # ── PostgreSQL Database ───────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: myshutterhost-db-local
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-myshutterhost}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdevpassword}
+      POSTGRES_DB: ${POSTGRES_DB:-myshutterhost}
+    ports:
+      - "5432:5432"       # Access from your laptop at localhost:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-myshutterhost}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis Cache ───────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: myshutterhost-redis-local
+    restart: unless-stopped
+    ports:
+      - "6379:6379"       # Access from your laptop at localhost:6379
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── pgAdmin (Database GUI) ────────────────────────────────
+  # Visit http://localhost:5050 to browse your local database visually
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: myshutterhost-pgadmin-local
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@myshutterhost.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    name: myshutterhost-postgres-data
+  redis_data:
+    name: myshutterhost-redis-data
+  pgadmin_data:
+    name: myshutterhost-pgadmin-data
