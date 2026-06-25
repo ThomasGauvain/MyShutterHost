@@ -139,43 +139,109 @@ MyShutterHost/ (Turborepo)
 
 ### 💰 Module 2 — Point of Sale & Monetization
 
-**Digital Products:**
-- [x] Sell digital downloads (pay-to-download individual photos or full galleries)
-- [x] Sell presets, overlays, and other digital files
-- [x] Accept tips from visitors
-- [x] **Hearts & Stars micropayment system** (like Facebook Stars — visitors buy icons/credits to send to photographers as support)
-- [x] Pay-to-unlock galleries (client pays before viewing)
+> **Architecture**: Custom build on top of Stripe. No separate e-commerce platform. Everything lives in our Next.js + PostgreSQL monorepo. Stripe handles payments, taxes, fraud, and photographer payouts. We build the product catalog, cart, order routing, and download delivery.
 
-**Physical Products:**
-- [x] Sell prints (standard sizes: 4x6, 8x10, 11x14, canvas, metal, fine art paper, etc.)
-- [x] Sell other products (USB drives, photo books, albums, greeting cards, framed prints)
-- [x] Print lab integrations (Printful, WHCC, Bay Photo, Miller's Lab) — lab fulfills & ships directly
+---
 
-**Shipping System:**
-- [x] **USPS integration** — First Class, Priority Mail, Priority Mail Express, Media Mail
-- [x] **UPS integration** — Ground, 2-Day Air, Next Day Air, Worldwide
-- [x] **FedEx integration** — Ground, Express, International Priority
-- [x] **DHL integration** — international shipping
-- [x] **Real-time rate shopping** — compare rates across all carriers at checkout, show cheapest or fastest options to customer
-- [x] **Shipping label generation** — purchase and print labels directly from the dashboard (no going to carrier websites)
-- [x] **Shipment tracking** — auto-send tracking number to customer by email; live tracking status in their order page
-- [x] **Package presets** — save common box sizes/weights so rates calculate automatically (e.g. "8x10 print mailer = 6oz, 10x13 envelope")
-- [x] **Shipping rules** — set free shipping thresholds (e.g. free shipping on orders over $75), flat rate options, or local pickup
-- [x] **International shipping** — customs forms auto-filled, harmonized tariff codes for prints/photo products
-- [x] **Address validation** — verify customer shipping address before order is placed (avoid failed deliveries)
-- [x] **Return labels** — generate prepaid return labels when needed
-- [x] **Shipping zones** — set different rates or restrict shipping by country/region
-- [x] **Multi-carrier fallback** — if one carrier API is down, automatically fall back to next carrier
-- [x] **Batch label printing** — print multiple shipping labels at once for bulk orders
-- [x] Order management dashboard (pending, in production, shipped, delivered status per order)
+**🏗️ POS Technical Architecture**
 
-**Pricing & Promotions:**
-- [x] Discount codes & coupons
-- [x] Gift cards
-- [x] Rush delivery / expedited shipping upsell at checkout
-- [x] Tax calculation + reporting (US sales tax, VAT for international)
-- [x] Stripe Connect (photographers receive payouts directly)
-- [x] Revenue dashboard (sales, tips, stars earned, payouts, shipping costs)
+```
+Customer Flow:
+Views gallery → clicks Buy/Download
+      ↓
+Cart (Redis session — fast, no DB hit)
+      ↓
+Stripe Checkout Session created (Stripe hosts the payment page)
+      ↓
+Stripe webhook: payment_intent.succeeded
+      ↓
+  IF digital download → signed Cloudflare R2 URL (expires 48hrs)
+                     → email download link (Resend)
+  IF print order     → route to Printful / WHCC / self-fulfill
+                     → lab ships directly, tracking auto-emailed
+      ↓
+Order in customer profile + photographer dashboard
+```
+
+**What Stripe Handles (we don't build these):**
+- Payment UI + card processing (PCI compliant automatically)
+- Automatic tax calculation — US sales tax + EU VAT (Stripe Tax)
+- Fraud detection (Stripe Radar ML)
+- Refund processing
+- Photographer payouts (Stripe Connect — auto-splits revenue)
+- Discount codes + promotion codes (Stripe Coupons)
+- Invoice PDF generation (Stripe Invoices)
+- Subscription billing for platform tiers
+
+**What We Build (custom in our stack):**
+
+*Product Catalog:*
+- [x] Product types: `DIGITAL_DOWNLOAD | PRINT | GIFT_CARD | ALBUM | USB`
+- [x] Products linked to specific photos OR entire galleries
+- [x] Print products with size/material options (8x10, canvas, metal, fine art)
+- [x] Digital download products with resolution tiers (standard / high-res)
+- [x] Self-fulfillment products (photographer ships themselves)
+- [x] Preset / action / plugin products (from marketplace)
+
+*Cart & Checkout:*
+- [x] Cart stored in Redis (fast session-based, no login required)
+- [x] Cart persists to PostgreSQL on checkout start
+- [x] Guest checkout — buy without creating an account
+- [x] Stripe Checkout Session — Stripe's hosted payment page (no card data touches our servers)
+- [x] Apple Pay / Google Pay / Buy Now Pay Later via Stripe
+
+*Digital Download Delivery:*
+- [x] After payment: generate time-limited signed Cloudflare R2 URL (expires 48hrs)
+- [x] Download limit enforcement (e.g. max 3 downloads per purchase)
+- [x] Secure delivery — URL is unique per order, can't be shared/scraped
+- [x] Re-download from order history (generates new signed URL on demand)
+- [x] Bulk download (buy full gallery → download as ZIP)
+
+*Print Order Routing:*
+- [x] **Printful** — automated API routing for consumer-grade prints, ships worldwide
+- [x] **WHCC** — professional lab routing for high-end print orders
+- [x] **Bay Photo / Miller's Lab** — additional pro lab options
+- [x] **Self-fulfillment** — photographer prints themselves, marks as shipped manually
+- [x] Per-product lab assignment — photographer sets which lab per print product
+- [x] Lab fallback — if primary lab is down, route to backup lab
+
+*Shipping (via EasyPost):*
+- [x] **USPS** — First Class, Priority, Priority Express, Media Mail
+- [x] **UPS** — Ground, 2-Day Air, Next Day Air, Worldwide
+- [x] **FedEx** — Ground, Express, International Priority
+- [x] **DHL** — international shipping
+- [x] Real-time rate comparison across all carriers at checkout
+- [x] Shipping label generation + purchase from dashboard
+- [x] Auto-send tracking number to customer via email
+- [x] Package size presets ("8x10 mailer = 6oz, 10x13 envelope")
+- [x] Free shipping threshold rules (free shipping over $75)
+- [x] Shipping zones — restrict or adjust rates by region/country
+- [x] International customs forms auto-filled
+- [x] Address validation before order placed
+- [x] Return label generation
+- [x] Batch label printing for multiple orders
+
+*Pricing & Promotions:*
+- [x] Discount codes & coupons (Stripe Promotion Codes + our UI)
+- [x] Gift cards (Stripe + our balance tracking in DB)
+- [x] Rush delivery upsell at checkout
+- [x] Tax calculation — Stripe Tax (automatic, all US states + EU VAT)
+- [x] **Stripe Connect** — photographers receive payouts directly (85% photographer / 15% platform)
+- [x] Revenue dashboard (sales, tips, stars earned, payouts, shipping costs, lab fees)
+
+*Order Management:*
+- [x] Order status: `PENDING → PAID → IN_PRODUCTION → SHIPPED → DELIVERED → REFUNDED`
+- [x] Photographer order dashboard with filter by status
+- [x] Customer order history in their profile with re-download links
+- [x] Refund processing via Stripe (dashboard button → Stripe handles it)
+
+**Hearts & Stars Micropayment System:**
+- [x] Platform-fixed tier system ($0.10 / $0.50 / $1.00 / $5.00 / $10.00)
+- [x] Each tier = a different animated icon (spark, star, heart, gem, crown)
+- [x] Visitors buy a bundle of credits via Stripe → spend on any photographer
+- [x] Platform takes 10% of all micropayments, rest goes to photographer
+- [x] Tips (freeform amount) — platform takes 5%
+- [x] All micropayments + tips visible in photographer revenue dashboard
 
 ---
 
@@ -231,15 +297,103 @@ A digital smart business card the photographer shows at events — guests scan o
 ---
 
 ### 📅 Module 4 — Booking, Contracts & Client Management
-- [x] Booking calendar (photographers set availability, clients book sessions)
-- [x] Wedding planner (multi-event timeline, shot list builder, vendor contacts)
-- [x] Digital contracts (photographer creates, client signs online — e-signature)
-- [x] Invoicing & payment requests
-- [x] Client CRM (track leads, sessions, communication history)
-- [x] Online questionnaires / intake forms for clients before shoots
-- [x] Mood board builder (share style inspiration with clients before sessions)
-- [x] Session packages (bundle hours + deliverables + pricing)
-- [x] Automated reminder emails (booking confirmation, session reminders, gallery ready)
+
+> **Architecture**: Fully custom, built into the photographer dashboard. No third-party CRM service. Replaces standalone tools like HoneyBook, Dubsado, and Studio Ninja — all included in our subscription.
+
+---
+
+**📋 CRM — Lead Pipeline (Kanban Board)**
+
+Visual pipeline — drag clients through stages:
+```
+NEW INQUIRY → CONSULTATION → PROPOSAL SENT → BOOKED → SHOT → EDITING → DELIVERED → ARCHIVED
+```
+- [x] Kanban board view — drag cards between stages
+- [x] List view — sortable table of all clients
+- [x] Filter by stage, tag, session type, date range, revenue
+- [x] Search clients by name, email, phone
+- [x] Client tags — [VIP] [Wedding] [Portrait] [Cosplay] [Referral] (custom tags)
+- [x] Quick stats — total leads this month, conversion rate, avg booking value
+
+**👤 Client Detail Page — Everything in One Place**
+- [x] Contact info (name, email, phone, location, social links)
+- [x] Full session timeline (every touchpoint from first inquiry to delivery)
+- [x] Private photographer notes (client never sees these)
+- [x] All documents in one place — contracts, invoices, questionnaires
+- [x] Gallery activity pulled from client profile (photos liked, downloaded, purchased)
+- [x] Purchase history — all orders, total spent
+- [x] Past + upcoming sessions with this client
+- [x] One-click rebooking with same package
+- [x] Stars & tips sent history
+
+**📬 Communication Log**
+- [x] Send emails to clients directly from the dashboard (powered by Resend)
+- [x] Every email sent is automatically logged to the client's timeline
+- [x] AI email drafting — AI writes the email based on context (uses Module 8 AI)
+- [x] Log calls and texts manually (add a note: "Called Sarah, confirmed date")
+- [x] Inbound email replies visible in the communication log
+- [x] Email delivery status tracking (delivered / opened / bounced via Resend webhooks)
+- [x] Email templates — save commonly used emails ("Gallery ready", "Booking confirmed", "Follow-up")
+
+**🔔 Reminders & Follow-Ups**
+- [x] Set reminders on any client ("Follow up on Jun 28")
+- [x] Auto-reminders — system creates these automatically:
+  - 3 weeks before session: "Send shot list to [Client]"
+  - 1 week before session: "Confirm session details with [Client]"
+  - 7 days after session: "Gallery due — start editing [Client]"
+  - 3 days after gallery delivery: "Check in — did [Client] view their gallery?"
+- [x] Reminder dashboard — all upcoming reminders in one view
+- [x] Daily digest email (optional opt-in) — today's reminders
+
+**📅 Booking Calendar**
+- [x] Photographer sets availability (open/blocked dates)
+- [x] Clients self-book from the photographer's website
+- [x] Session packages — bundle hours + deliverables + pricing
+- [x] Deposit collection at booking (Stripe — set % or fixed amount)
+- [x] Balance due reminder before session
+- [x] iCal feed export (subscribe in Google Calendar, Apple Calendar, Outlook)
+- [x] Google Calendar two-way sync (changes in either direction sync both ways)
+- [x] Mini sessions — fixed time slots, limited availability, displayed on public site
+- [x] Booking confirmation email (automated, Resend)
+- [x] Session reminder emails (automated — 1 week + 1 day before)
+
+**📄 Digital Contracts & E-Signatures**
+- [x] Photographer creates contract templates (wedding, portrait, TFP, model release)
+- [x] Client signs online — legally binding e-signature
+- [x] Signed contract PDF stored and linked to client's session
+- [x] Contract status visible in pipeline (signed / unsigned / expired)
+- [x] Auto-send contract after booking (with deposit payment link)
+- [x] AI contract clause helper — AI explains legal terms or suggests additions
+
+**🧾 Invoicing & Payments**
+- [x] Create and send invoices from the dashboard (Stripe Invoices)
+- [x] Stripe payment link embedded in invoice email
+- [x] Partial payments / installment schedules
+- [x] Invoice status — draft / sent / partially paid / paid / overdue
+- [x] Automatic overdue reminders
+- [x] PDF invoice download (client + photographer copies)
+- [x] Invoice history per client
+
+**📋 Questionnaires & Intake Forms**
+- [x] Build custom intake questionnaires per session type
+- [x] Auto-send questionnaire after booking confirmation
+- [x] Client fills out form in their profile — photographer sees responses
+- [x] Question types: short text, long text, multiple choice, date picker, file upload
+- [x] AI questionnaire generator — *"Generate a wedding intake questionnaire"*
+- [x] Questionnaire responses linked to client's session in the CRM
+
+**🎨 Mood Board Builder**
+- [x] Client shares style inspiration images (upload or link from Pinterest)
+- [x] Photographer adds their own reference images
+- [x] Collaborative board — both sides can add/comment
+- [x] AI style analysis — AI describes the mood/style of the board to help align expectations
+
+**💒 Wedding Planner**
+- [x] Multi-event timeline (engagement, rehearsal dinner, ceremony, reception)
+- [x] Shot list builder with drag-and-drop sections (getting ready, first look, ceremony, etc.)
+- [x] Vendor contact book (DJ, florist, venue, caterer — with name/phone/email)
+- [x] Day-of timeline (hour-by-hour schedule)
+- [x] AI shot list generator — *"Generate a shot list for a 6-hour Indian fusion wedding"*
 
 ---
 
@@ -1143,4 +1297,171 @@ Photographers bring their own API key. The dashboard **AI Settings** section inc
 5. **Automated tests from day one** — As sole developer, tests are your safety net
 6. **Launch with 3 templates, not 8** — Polish 3 templates perfectly rather than 8 mediocrely
 7. **Hire a designer** — Even a one-time contract designer for the template themes will be worth it
+
+---
+
+### 🔌 Module 16 — Public API & External Integrations
+
+> **Purpose**: Let photographers connect MyShutterHost to their existing tools — QuickBooks, Google Calendar, Zapier, booking software, and custom workflows. Also enables third-party developers to build integrations. This is what separates a platform from just a website.
+
+---
+
+**🌐 Public REST API (v1)**
+
+> **Architecture**: Custom REST API built into our Next.js app using Route Handlers. Authenticated via API key or OAuth 2.0 token. Versioned, rate-limited, fully documented.
+
+```
+Base URL:       api.myshutterhost.com/v1/
+Auth:           Authorization: Bearer <api_key>
+Format:         JSON
+Rate limits:    60 req/min (Pro) / 200 req/min (Studio) / 500 req/min (Enterprise)
+Versioning:     URL-based (/v1/, /v2/) — old versions supported 12 months post-deprecation
+```
+
+*Clients & CRM:*
+- [x] `GET    /clients` — list all clients (paginated, filterable by stage/tag/date)
+- [x] `POST   /clients` — create a new client or lead
+- [x] `GET    /clients/:id` — full client detail
+- [x] `PATCH  /clients/:id` — update client info, stage, tags, notes
+- [x] `GET    /clients/:id/communications` — full communication log
+- [x] `POST   /clients/:id/communications` — log a call, note, or email
+
+*Bookings & Sessions:*
+- [x] `GET    /bookings` — list all bookings
+- [x] `POST   /bookings` — create a booking
+- [x] `GET    /bookings/:id` — booking detail
+- [x] `PATCH  /bookings/:id` — update booking (date, status, package, notes)
+- [x] `DELETE /bookings/:id` — cancel booking
+- [x] `GET    /availability` — available booking slots for a date range
+
+*Galleries:*
+- [x] `GET    /galleries` — list all galleries
+- [x] `POST   /galleries` — create a gallery
+- [x] `GET    /galleries/:id` — gallery detail + metadata
+- [x] `PATCH  /galleries/:id` — update gallery settings
+- [x] `GET    /galleries/:id/photos` — list photos in a gallery
+
+*Orders & Invoices:*
+- [x] `GET    /orders` — list all orders with status
+- [x] `GET    /orders/:id` — order detail with line items + tracking
+- [x] `GET    /invoices` — list all invoices
+- [x] `POST   /invoices` — create and send an invoice
+- [x] `GET    /invoices/:id` — invoice detail with payment status
+
+*Events & Calendar:*
+- [x] `GET    /events` — list upcoming events and mini sessions
+- [x] `POST   /events` — create an event
+- [x] `GET    /calendar/feed.ics` — iCal feed (subscribe in any calendar app)
+
+---
+
+**🔑 API Key Management**
+- [x] Photographer generates named API keys in dashboard settings ("QuickBooks", "Zapier", "Custom App")
+- [x] Per-key permission scopes — `read:clients` / `write:bookings` / `read:invoices` / `read:galleries` / `write:orders` etc.
+- [x] Key revocation — disable a key instantly if compromised
+- [x] API usage log — see every request made by each key (endpoint, timestamp, response code)
+- [x] Rate limit usage shown per key in dashboard
+
+---
+
+**🔐 OAuth 2.0 Provider**
+
+For third-party apps needing user-authorized access (not just static API keys):
+- [x] Authorization code flow — user clicks "Connect to [App]", grants specific permissions
+- [x] Granular scopes — `read:clients` / `write:bookings` / `read:invoices` / `read:galleries`
+- [x] Token refresh — long-lived access without re-authentication prompts
+- [x] App registration — developers register apps at `developers.myshutterhost.com`
+- [x] Connected apps list in photographer dashboard settings — see + revoke any connected app
+- [x] Token revocation — photographer disconnects an app with one click
+
+---
+
+**📡 Webhooks**
+
+Push events to external systems the moment something happens:
+
+| Event | When It Fires |
+|-------|--------------|
+| `booking.created` | New session booked |
+| `booking.cancelled` | Booking cancelled |
+| `invoice.sent` | Invoice emailed to client |
+| `invoice.paid` | Payment received |
+| `invoice.overdue` | Invoice past due date |
+| `order.created` | New print or download order |
+| `order.shipped` | Print order shipped (tracking number available) |
+| `gallery.published` | Gallery made public |
+| `gallery.delivered` | Client gallery notification sent |
+| `client.created` | New lead or client added |
+| `client.stage_changed` | Client moved in CRM pipeline |
+| `contract.signed` | Client signs a contract |
+| `tip.received` | Tip or Stars payment received |
+
+- [x] Configure webhook endpoint URLs in dashboard (one or many endpoints)
+- [x] Signed payloads — HMAC-SHA256 signature header for security (same pattern as Stripe)
+- [x] Automatic retry — 3 attempts with exponential backoff on failure (5s, 30s, 5min)
+- [x] Webhook delivery log — every event sent, HTTP status returned, response body
+- [x] "Send test event" button — fire a sample payload to verify your endpoint works
+- [x] Pause / resume webhooks per endpoint without deleting
+
+---
+
+**🔗 Pre-Built Connectors**
+
+*📊 QuickBooks Online:*
+- [x] Connect via OAuth in dashboard ("Connect to QuickBooks" one-click button)
+- [x] Auto-sync clients → QuickBooks customers (new client created → QB customer created)
+- [x] Auto-sync invoices → QuickBooks invoices (invoice sent from our dashboard → appears in QB)
+- [x] Payment sync — invoice marked paid in Stripe → auto-mark paid in QuickBooks
+- [x] Tax data sync — Stripe Tax amounts → correct QuickBooks tax categories
+- [x] Revenue export — pull monthly/quarterly revenue report into QuickBooks
+- [x] Two-way option — changes made in QuickBooks reflect in our CRM
+
+*📅 Google Calendar:*
+- [x] Connect via OAuth ("Connect Google Calendar" button in dashboard)
+- [x] Two-way sync — bookings created in our system appear in Google Calendar automatically
+- [x] Blocks in Google Calendar import as unavailable dates in our booking calendar
+- [x] Session details (client name, location, package) sync as calendar event description
+- [x] Date changes sync both ways — update in either app, both reflect the change
+
+*📆 iCal Feed (Apple Calendar, Outlook, any app):*
+- [x] Read-only iCal subscription URL generated per photographer
+- [x] Paste URL into Apple Calendar, Outlook, Fantastical, or any calendar app
+- [x] Auto-updates every hour — new bookings appear automatically
+- [x] All bookings + events included in the feed
+- [x] Secure token in URL — can be regenerated if shared accidentally
+
+*⚡ Zapier Integration:*
+- [x] Official MyShutterHost Zapier app (submitted to Zapier marketplace)
+- [x] **Triggers** (MyShutterHost → Zapier → 6,000+ apps):
+  - New booking created
+  - New client/lead added
+  - Invoice paid
+  - Gallery published or delivered
+  - New order placed
+  - Contract signed
+  - Tip received
+- [x] **Actions** (6,000+ apps → Zapier → MyShutterHost):
+  - Create a client
+  - Create a booking
+  - Log a communication note
+  - Send an invoice
+  - Update pipeline stage
+- [x] Example Zaps: "When booking created → add to Google Sheet" / "When invoice paid → send Slack message" / "When client created → add to Mailchimp list"
+
+*🔧 Make (Integromat) Integration:*
+- [x] Same triggers and actions as Zapier, available in Make marketplace
+- [x] Supports multi-step scenarios and data transformation
+
+---
+
+**📖 Developer Portal**
+- [x] Public API docs at `developers.myshutterhost.com`
+- [x] Interactive API explorer — try live API calls from the browser (like Stripe's API explorer)
+- [x] Code examples in JavaScript, Python, PHP, Ruby, and curl
+- [x] Webhook testing tool — send sample events without real data
+- [x] OAuth app registration for third-party developers
+- [x] API changelog — documented breaking changes and deprecation notices
+- [x] Sandbox environment — full API access against dummy data, separate from real account
+
+
 
